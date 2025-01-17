@@ -1,0 +1,126 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: Int!
+  role: Role!
+  head_id: Int
+  member_code: String
+  email_address: String
+  mobile: String
+  plain_password: String
+  password: String
+  relationship_id: Int
+  sub_community_id: Int
+  local_community_id: Int
+  first_name: String
+  last_name_id: Int
+  father_name: String
+  mother_name: String
+  status: Boolean!
+  gender: String
+  phone: String
+  profile_pic: String!
+  region: String
+  is_expired: Boolean!
+  expire_date: DateTime
+  education_id: Int
+  occupation_id: Int
+  deleted: Boolean!
+  login_status: Boolean
+  last_login: DateTime
+  profile_password: String
+  profile_percent: Float!
+}
+
+enum Role {
+  ADMIN
+  USER
+  SUPERADMIN
+  SUB_ADMIN
+  LOCAL_ADMIN
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Query {
+  securedResourceforUser: String!
+  securedResourceforAdmin: String!
+  login(mobile: String!, password: String!): String!
+  getAllUsers: [User!]!
+  findUserById(userId: Int!): User!
+  findUserByMobile(mobile: String!): User!
+}
+
+type Mutation {
+  deleteUserById(userId: Int!): String!
+  addUser(addUserArgs: AddUserArgs!): String!
+  updateUser(updateUserArgs: UpdateUserArgs!): String!
+}
+
+input AddUserArgs {
+  role: Role
+  head_id: Int
+  member_code: String
+  email_address: String
+  mobile: String
+  plain_password: String
+  password: String
+  relationship_id: Int
+  sub_community_id: Int
+  local_community_id: Int
+  first_name: String
+  last_name_id: Int
+  father_name: String
+  mother_name: String
+  status: Boolean! = true
+  gender: String
+  phone: String
+  profile_pic: String! = "noimage.png"
+  region: String
+  is_expired: Boolean! = false
+  expire_date: DateTime
+  education_id: Int
+  occupation_id: Int
+  deleted: Boolean! = false
+  login_status: Boolean
+  last_login: DateTime
+  profile_password: String
+  profile_percent: Int! = 5
+}
+
+input UpdateUserArgs {
+  id: Int!
+  role: Role
+  head_id: Int
+  member_code: String
+  email_address: String
+  mobile: String
+  plain_password: String
+  password: String
+  relationship_id: Int
+  sub_community_id: Int
+  local_community_id: Int
+  first_name: String
+  last_name_id: Int
+  father_name: String
+  mother_name: String
+  status: Boolean! = true
+  gender: String
+  phone: String
+  profile_pic: String! = "noimage.png"
+  region: String
+  is_expired: Boolean! = false
+  expire_date: DateTime
+  education_id: Int
+  occupation_id: Int
+  deleted: Boolean! = false
+  login_status: Boolean
+  last_login: DateTime
+  profile_password: String
+  profile_percent: Int! = 5
+}
