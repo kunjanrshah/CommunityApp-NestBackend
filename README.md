@@ -58,16 +58,79 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+## connect pgadmin4 using docker
+To add a `pgAdmin` container to your `docker-compose.yml` file, follow these steps:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+### **Step 1: Update `docker-compose.yml`**
+Add a new service for `pgAdmin` alongside your existing PostgreSQL configuration. Here’s an example:
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```yaml
+version: '3.8'
 
-## License
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: your_database
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-Nest is [MIT licensed](LICENSE).
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin_password
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+```
+
+---
+
+### **Step 2: Start the Services**
+Run the following command to start both the PostgreSQL and pgAdmin services:
+```bash
+docker-compose up -d
+```
+
+---
+
+### **Step 3: Access pgAdmin**
+1. Open your web browser and navigate to `http://localhost:8080`.
+2. Log in using the credentials provided in the `PGADMIN_DEFAULT_EMAIL` and `PGADMIN_DEFAULT_PASSWORD` environment variables from your `docker-compose.yml` file.
+
+---
+
+### **Step 4: Connect pgAdmin to PostgreSQL**
+1. Once logged in, click on "Add New Server."
+2. Enter the following details:
+   - **Name**: Any name for your server (e.g., `Postgres`).
+3. Go to the **Connection** tab and provide:
+   - **Host**: `postgres` (this should match the service name in your `docker-compose.yml` file).
+   - **Port**: `5432`.
+   - **Username**: `POSTGRES_USER` from the `postgres` service environment variables (e.g., `postgres`).
+   - **Password**: `POSTGRES_PASSWORD` from the `postgres` service environment variables (e.g., `your_password`).
+
+4. Save the configuration. You should now see the PostgreSQL database in the pgAdmin interface.
+
+---
+
+### **Additional Notes**
+- Make sure `postgres` and `pgadmin` services are on the same Docker network (default is fine when defined in the same `docker-compose.yml`).
+- Replace `your_password` and `your_database` with your desired credentials and database name.
+
+This setup should allow you to manage your PostgreSQL database with pgAdmin!
