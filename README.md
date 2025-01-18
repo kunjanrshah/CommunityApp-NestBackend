@@ -58,7 +58,7 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## connect pgadmin4 using docker
+## Connect pgadmin4 using docker
 To add a `pgAdmin` container to your `docker-compose.yml` file, follow these steps:
 
 ---
