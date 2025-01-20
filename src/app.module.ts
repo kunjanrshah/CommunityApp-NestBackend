@@ -7,9 +7,18 @@ import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
+
+// Use NODE_ENV to load appropriate file
+// NODE_ENV=dev npm run start:dev
+// NODE_ENV=prod npm run start:prod
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes the config available globally
+      envFilePath: `.env.${process.env.NODE_ENV || 'dev'}`, 
+    }),
     UserModule,
     AuthModule,
     GraphQLModule.forRoot({
@@ -20,18 +29,23 @@ import { AuthModule } from './auth/auth.module';
         path: join(process.cwd(), 'src/graphql.ts'),
       }
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'postgres',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'community',
-      entities: ['dist/**/*.entity{.ts,.js}'],
-      synchronize: true,
-      autoLoadEntities: true,
-      logging: true,
-    })
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'), 
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        entities: ['dist/**/*.entity{.ts,.js}'],
+        synchronize: true,
+        autoLoadEntities: true,
+        logging: true,
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
