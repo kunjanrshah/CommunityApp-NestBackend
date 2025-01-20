@@ -27,8 +27,8 @@ services:
     depends_on:
       - postgres
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - .:/usr/src/app   # Maps your host directory to the container
+      - /usr/src/app/node_modules   # Avoid conflicts with node_modules
     command: npm run start:dev
 
   pgadmin:
