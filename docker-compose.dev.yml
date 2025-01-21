@@ -15,6 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+   # image: kunjan16/community-backend:dev
     container_name: nestjs-app-dev
     ports:
       - "3000:3000"
