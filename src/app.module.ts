@@ -5,10 +5,9 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma/prisma.service';
 import { DomainModule } from './domain/domain.module';
-
 
 // Use NODE_ENV to load appropriate file
 // NODE_ENV=dev npm run start:dev
@@ -17,7 +16,7 @@ import { DomainModule } from './domain/domain.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Makes the config available globally
-      envFilePath: `.env.${process.env.NODE_ENV || 'dev'}`, 
+      envFilePath: `.env.${process.env.NODE_ENV || 'dev'}`,
     }),
     DomainModule,
     AuthModule,
@@ -25,10 +24,10 @@ import { DomainModule } from './domain/domain.module';
       driver: ApolloDriver,
       playground: true,
       debug: true,
-      autoSchemaFile:join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
-      }
+      },
     }),
   ],
   controllers: [AppController],

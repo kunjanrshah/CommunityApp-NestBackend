@@ -59,11 +59,13 @@ $ npm run test:cov
 ```
 
 ## Connect pgadmin4 using docker
+
 To add a `pgAdmin` container to your `docker-compose.yml` file, follow these steps:
 
 ---
 
 ### **Step 1: Update `docker-compose.yml`**
+
 Add a new service for `pgAdmin` alongside your existing PostgreSQL configuration. Here’s an example:
 
 ```yaml
@@ -79,7 +81,7 @@ services:
       POSTGRES_PASSWORD: your_password
       POSTGRES_DB: your_database
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -91,7 +93,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
       PGADMIN_DEFAULT_PASSWORD: admin_password
     ports:
-      - "8080:80"
+      - '8080:80'
     depends_on:
       - postgres
 
@@ -102,7 +104,9 @@ volumes:
 ---
 
 ### **Step 2: Start the Services**
+
 Run the following command to start both the PostgreSQL and pgAdmin services:
+
 ```bash
 docker-compose up -d
 ```
@@ -110,16 +114,19 @@ docker-compose up -d
 ---
 
 ### **Step 3: Access pgAdmin**
+
 1. Open your web browser and navigate to `http://localhost:8080`.
 2. Log in using the credentials provided in the `PGADMIN_DEFAULT_EMAIL` and `PGADMIN_DEFAULT_PASSWORD` environment variables from your `docker-compose.yml` file.
 
 ---
 
 ### **Step 4: Connect pgAdmin to PostgreSQL**
+
 1. Once logged in, click on "Add New Server."
 2. Enter the following details:
    - **Name**: Any name for your server (e.g., `Postgres`).
 3. Go to the **Connection** tab and provide:
+
    - **Host**: `postgres` (this should match the service name in your `docker-compose.yml` file).
    - **Port**: `5432`.
    - **Username**: `POSTGRES_USER` from the `postgres` service environment variables (e.g., `postgres`).
@@ -130,6 +137,7 @@ docker-compose up -d
 ---
 
 ### **Additional Notes**
+
 - Make sure `postgres` and `pgadmin` services are on the same Docker network (default is fine when defined in the same `docker-compose.yml`).
 - Replace `your_password` and `your_database` with your desired credentials and database name.
 

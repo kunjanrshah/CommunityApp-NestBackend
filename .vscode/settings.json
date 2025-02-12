@@ -2,5 +2,6 @@
     "files.watcherExclude": {
         "**/node_modules/**": true,
         "**/.git/objects/**": true
-    }
+    },
+    "workbench.tree.indent": 22
 }

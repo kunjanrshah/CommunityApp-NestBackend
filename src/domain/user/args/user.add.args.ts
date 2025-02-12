@@ -1,10 +1,9 @@
-import { InputType, Field, Int, Float } from '@nestjs/graphql';
+import { InputType, Field, Int } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
 
 @InputType()
 export class AddUserArgs {
-
-  @Field(() => Role , { nullable: true })
+  @Field(() => Role, { nullable: true })
   role: Role;
 
   @Field(() => Int, { nullable: true })
@@ -50,7 +49,7 @@ export class AddUserArgs {
   status: boolean;
 
   @Field({ nullable: true })
-  gender?: string;
+  gender?: boolean;
 
   @Field({ nullable: true })
   phone?: string;

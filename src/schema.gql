@@ -57,6 +57,7 @@ type Mutation {
   deleteUserById(userId: Int!): String!
   registrationUser(addUserArgs: AddUserArgs!): UserSchema!
   addUser(addUserArgs: AddUserArgs!): UserSchema!
+  registerUser(registerUserArgs: RegisterUserArgs!): UserSchema!
   updateUser(userId: Int!, updateUserArgs: UpdateUserArgs!): UserSchema!
 }
 
@@ -76,7 +77,7 @@ input AddUserArgs {
   father_name: String
   mother_name: String
   status: Boolean! = true
-  gender: String
+  gender: Boolean
   phone: String
   profile_pic: String! = "noimage.png"
   region: String
@@ -89,6 +90,21 @@ input AddUserArgs {
   last_login: DateTime
   profile_password: String
   profile_percent: Int! = 5
+}
+
+input RegisterUserArgs {
+  first_name: String!
+  last_name_id: Int!
+  email_address: String!
+  mobile: String!
+  password: String!
+  sub_community_id: Int!
+  local_community_id: Int!
+  state_id: Int!
+  city_id: Int!
+  address: String!
+  gender: Boolean!
+  profile_pic: String! = "noimage.png"
 }
 
 input UpdateUserArgs {
@@ -107,7 +123,7 @@ input UpdateUserArgs {
   father_name: String
   mother_name: String
   status: Boolean = true
-  gender: String
+  gender: Boolean
   phone: String
   profile_pic: String = "noimage.png"
   region: String

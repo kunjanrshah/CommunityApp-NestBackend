@@ -16,7 +16,7 @@ datasource db {
 // schema.prisma
 model User {
   id                Int      @id @default(autoincrement())
-  role              Role
+  role              Role     @default(USER)
   head_id           Int?     // Optional field
   member_code       String?  @unique // Optional field
   email_address     String?  // Optional field
@@ -31,7 +31,7 @@ model User {
   father_name       String?  // Optional field
   mother_name       String?  // Optional field
   status            Boolean  @default(true)
-  gender            String?  // Optional field
+  gender            Boolean?  // Optional field
   phone             String?  // Optional field
   profile_pic       String   @default("noimage.png")
   region            String?  // Optional field

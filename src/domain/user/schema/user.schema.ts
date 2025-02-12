@@ -1,6 +1,5 @@
-import { Int, Field, ObjectType, Float, registerEnumType } from "@nestjs/graphql";
+import { Int, Field, ObjectType, Float, registerEnumType } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
-
 
 registerEnumType(Role, {
   name: 'Role', // GraphQL name
@@ -45,7 +44,7 @@ export class UserSchema {
   first_name?: string;
 
   @Field(() => Int, { nullable: true })
-  last_name_id?: number; 
+  last_name_id?: number;
 
   @Field({ nullable: true })
   father_name?: string;
@@ -57,12 +56,12 @@ export class UserSchema {
   status: boolean;
 
   @Field({ nullable: true })
-  gender?: string; 
+  gender?: string;
 
   @Field({ nullable: true })
   phone?: string;
 
-  @Field({ defaultValue: "noimage.png" })
+  @Field({ defaultValue: 'noimage.png' })
   profile_pic: string;
 
   @Field({ nullable: true })
@@ -84,10 +83,10 @@ export class UserSchema {
   deleted: boolean;
 
   @Field({ nullable: true })
-  login_status?: boolean; 
+  login_status?: boolean;
 
   @Field({ nullable: true })
-  last_login?: Date; 
+  last_login?: Date;
 
   @Field({ nullable: true })
   profile_password?: string;

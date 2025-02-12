@@ -1,32 +1,33 @@
-import { Injectable } from '@nestjs/common'
-import { AddUserArgs } from './args/user.add.args'
-import { UpdateUserArgs } from './args/user.update.args'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { Injectable } from '@nestjs/common';
+import { AddUserArgs } from './args/user.add.args';
+import { UpdateUserArgs } from './args/user.update.args';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RegisterUserArgs } from './args/user.registration.args';
 
 @Injectable()
 export class UserService {
-  constructor (private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async login (mobile: string, password: string) {
+  async login(mobile: string, password: string) {
     const user = await this.prisma.user.findFirst({
       where: { mobile, password },
-    })
-    return user
+    });
+    return user;
   }
 
-  async getAllUsers () {
-    let users = await this.prisma.user.findMany()
-    return users
+  async getAllUsers() {
+    const users = await this.prisma.user.findMany();
+    return users;
   }
 
-  async findUserById (id: number) {
-    let user = await this.prisma.user.findUnique({ where: { id } })
-    return user
+  async findUserById(id: number) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    return user;
   }
 
-  async findUserByMobile (mobile: string) {
-    const user = await this.prisma.user.findFirst({ where: { mobile } })
-    return user
+  async findUserByMobile(mobile: string) {
+    const user = await this.prisma.user.findFirst({ where: { mobile } });
+    return user;
   }
 
   async deleteUser(id: number): Promise<string> {
@@ -39,19 +40,23 @@ export class UserService {
       return `Failed to delete user with ID ${id}: ${error.message}`;
     }
   }
-  
 
-  async addUser (addUserArgs: AddUserArgs) {
+  async addUser(addUserArgs: AddUserArgs) {
     return await this.prisma.user.create({
       data: { ...addUserArgs },
-    })
-    
+    });
   }
 
-  async updateUser (id: number, updateUserArgs: UpdateUserArgs) {
+  async registerUser(registerUserArgs: RegisterUserArgs) {
+    return await this.prisma.user.create({
+      data: { ...registerUserArgs },
+    });
+  }
+
+  async updateUser(id: number, updateUserArgs: UpdateUserArgs) {
     return await this.prisma.user.update({
       where: { id },
       data: { ...updateUserArgs },
-    })
+    });
   }
 }

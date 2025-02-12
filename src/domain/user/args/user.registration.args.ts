@@ -1,40 +1,40 @@
-import { InputType, Field, Int} from '@nestjs/graphql'
+import { InputType, Field, Int } from '@nestjs/graphql';
 
 @InputType()
-export class RegistrationUserArgs {
+export class RegisterUserArgs {
   @Field()
-  first_name?: string
+  first_name?: string;
 
   @Field(() => Int)
-  last_name_id?: number
-
-  @Field()
-  email_address?: string
+  last_name_id?: number;
 
   @Field()
-  mobile?: string
+  email_address?: string;
 
   @Field()
-  password?: string
-
-  @Field(() => Int)
-  sub_community_id?: number
-
-  @Field(() => Int)
-  local_community_id?: number
-
-  @Field(() => Int)
-  state_id?: number
-
-  @Field(() => Int)
-  city_id?: number
+  mobile?: string;
 
   @Field()
-  address?: string
+  password?: string;
 
   @Field(() => Int)
-  gender?: number
+  sub_community_id?: number;
+
+  @Field(() => Int)
+  local_community_id?: number;
+
+  @Field(() => Int)
+  state_id?: number;
+
+  @Field(() => Int)
+  city_id?: number;
+
+  @Field()
+  address?: string;
+
+  @Field(() => Boolean)
+  gender?: boolean;
 
   @Field({ defaultValue: 'noimage.png' })
-  profile_pic: string
+  profile_pic: string;
 }

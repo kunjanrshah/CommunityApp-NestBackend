@@ -1,21 +1,20 @@
-import { CanActivate, ExecutionContext} from '@nestjs/common'
-import { GqlExecutionContext } from '@nestjs/graphql'
+import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 export class RoleGuard implements CanActivate {
- 
-    public role: string;
+  public role: string;
 
-    constructor(role: string) {
-        this.role = role;
-    }
+  constructor(role: string) {
+    this.role = role;
+  }
 
-    async canActivate (context: ExecutionContext): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context).getContext();
-    const {role} = ctx.user;    
+    const { role } = ctx.user;
 
     if (role === this.role) {
-        return true;
-    }    
+      return true;
+    }
     return false;
   }
 }

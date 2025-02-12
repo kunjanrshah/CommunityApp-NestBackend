@@ -29,7 +29,7 @@ export interface AddUserArgs {
     father_name?: Nullable<string>;
     mother_name?: Nullable<string>;
     status: boolean;
-    gender?: Nullable<string>;
+    gender?: Nullable<boolean>;
     phone?: Nullable<string>;
     profile_pic: string;
     region?: Nullable<string>;
@@ -42,6 +42,21 @@ export interface AddUserArgs {
     last_login?: Nullable<DateTime>;
     profile_password?: Nullable<string>;
     profile_percent: number;
+}
+
+export interface RegisterUserArgs {
+    first_name: string;
+    last_name_id: number;
+    email_address: string;
+    mobile: string;
+    password: string;
+    sub_community_id: number;
+    local_community_id: number;
+    state_id: number;
+    city_id: number;
+    address: string;
+    gender: boolean;
+    profile_pic: string;
 }
 
 export interface UpdateUserArgs {
@@ -60,7 +75,7 @@ export interface UpdateUserArgs {
     father_name?: Nullable<string>;
     mother_name?: Nullable<string>;
     status?: Nullable<boolean>;
-    gender?: Nullable<string>;
+    gender?: Nullable<boolean>;
     phone?: Nullable<string>;
     profile_pic?: Nullable<string>;
     region?: Nullable<string>;
@@ -120,6 +135,7 @@ export interface IMutation {
     deleteUserById(userId: number): string | Promise<string>;
     registrationUser(addUserArgs: AddUserArgs): UserSchema | Promise<UserSchema>;
     addUser(addUserArgs: AddUserArgs): UserSchema | Promise<UserSchema>;
+    registerUser(registerUserArgs: RegisterUserArgs): UserSchema | Promise<UserSchema>;
     updateUser(userId: number, updateUserArgs: UpdateUserArgs): UserSchema | Promise<UserSchema>;
 }
 
