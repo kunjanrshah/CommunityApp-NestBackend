@@ -1,11 +1,8 @@
 import { InputType, Field, Int, Float } from '@nestjs/graphql';
-import { Role } from '../schema/user.schema';
+import { Role } from '@prisma/client';
 
 @InputType()
-export class UpdateUserArgs {
-  
-  @Field(() => Int)
-  id: number;
+export class AddUserArgs {
 
   @Field(() => Role , { nullable: true })
   role: Role;

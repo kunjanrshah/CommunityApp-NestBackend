@@ -10,10 +10,7 @@
 
 export enum Role {
     ADMIN = "ADMIN",
-    USER = "USER",
-    SUPERADMIN = "SUPERADMIN",
-    SUB_ADMIN = "SUB_ADMIN",
-    LOCAL_ADMIN = "LOCAL_ADMIN"
+    USER = "USER"
 }
 
 export interface AddUserArgs {
@@ -48,7 +45,6 @@ export interface AddUserArgs {
 }
 
 export interface UpdateUserArgs {
-    id: number;
     role?: Nullable<Role>;
     head_id?: Nullable<number>;
     member_code?: Nullable<string>;
@@ -63,23 +59,23 @@ export interface UpdateUserArgs {
     last_name_id?: Nullable<number>;
     father_name?: Nullable<string>;
     mother_name?: Nullable<string>;
-    status: boolean;
+    status?: Nullable<boolean>;
     gender?: Nullable<string>;
     phone?: Nullable<string>;
-    profile_pic: string;
+    profile_pic?: Nullable<string>;
     region?: Nullable<string>;
-    is_expired: boolean;
+    is_expired?: Nullable<boolean>;
     expire_date?: Nullable<DateTime>;
     education_id?: Nullable<number>;
     occupation_id?: Nullable<number>;
-    deleted: boolean;
+    deleted?: Nullable<boolean>;
     login_status?: Nullable<boolean>;
     last_login?: Nullable<DateTime>;
     profile_password?: Nullable<string>;
-    profile_percent: number;
+    profile_percent?: Nullable<number>;
 }
 
-export interface User {
+export interface UserSchema {
     id: number;
     role: Role;
     head_id?: Nullable<number>;
@@ -115,15 +111,16 @@ export interface IQuery {
     securedResourceforUser(): string | Promise<string>;
     securedResourceforAdmin(): string | Promise<string>;
     login(mobile: string, password: string): string | Promise<string>;
-    getAllUsers(): User[] | Promise<User[]>;
-    findUserById(userId: number): User | Promise<User>;
-    findUserByMobile(mobile: string): User | Promise<User>;
+    getAllUsers(): UserSchema[] | Promise<UserSchema[]>;
+    findUserById(userId: number): UserSchema | Promise<UserSchema>;
+    findUserByMobile(mobile: string): UserSchema | Promise<UserSchema>;
 }
 
 export interface IMutation {
     deleteUserById(userId: number): string | Promise<string>;
-    addUser(addUserArgs: AddUserArgs): string | Promise<string>;
-    updateUser(updateUserArgs: UpdateUserArgs): string | Promise<string>;
+    registrationUser(addUserArgs: AddUserArgs): UserSchema | Promise<UserSchema>;
+    addUser(addUserArgs: AddUserArgs): UserSchema | Promise<UserSchema>;
+    updateUser(userId: number, updateUserArgs: UpdateUserArgs): UserSchema | Promise<UserSchema>;
 }
 
 export type DateTime = any;

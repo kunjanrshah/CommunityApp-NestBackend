@@ -1,8 +1,8 @@
 import { Resolver, Query, Args, Int, Mutation, Context } from '@nestjs/graphql'
-import { User } from './schema/user.schema'
+import { UserSchema } from './schema/user.schema'
 import { UserService } from './user.service'
-import { AddUserArgs } from './args/add.user.args'
-import { UpdateUserArgs } from './args/update.user.args'
+import { AddUserArgs } from './args/user.add.args'
+import { UpdateUserArgs } from './args/user.update.args'
 import { UseGuards } from '@nestjs/common'
 import { AuthGuard } from 'src/auth/auth.guard'
 import * as jwt from 'jsonwebtoken'
@@ -10,19 +10,19 @@ import { JwtGuard } from 'src/auth/jwt.guard'
 import { Role } from 'src/graphql'
 import { RoleGuard } from 'src/auth/role.guard'
 
-@Resolver(() => User)
+@Resolver(() => UserSchema)
 export class UserResolver {
   constructor (private readonly userService: UserService) {}
 
   @Query(() => String)
   @UseGuards(JwtGuard, new RoleGuard(Role.USER))
-  securedResourceforUser(@Context('user') user: User){
+  securedResourceforUser(@Context('user') user: UserSchema){
     return 'This is Secured Resource'+ JSON.stringify(user)
   }
 
   @Query(() => String)
   @UseGuards(JwtGuard,  new RoleGuard(Role.ADMIN))
-  securedResourceforAdmin(@Context('user') user: User){
+  securedResourceforAdmin(@Context('user') user: UserSchema){
     return 'This is Secured Resource'+ JSON.stringify(user)
   }
 
@@ -31,7 +31,7 @@ export class UserResolver {
   login (
     @Args({ name: 'mobile', type: () => String }) mobile: string,
     @Args({ name: 'password', type: () => String }) password: string,
-    @Context('user') user: User,
+    @Context('user') user: UserSchema,
   ) {
     let payload = {
       id: user.id,
@@ -46,17 +46,17 @@ export class UserResolver {
     return jwt.sign(payload, 'secret', { expiresIn: '1h' })
   }
 
-  @Query(() => [User])
+  @Query(() => [UserSchema])
   getAllUsers () {
     return this.userService.getAllUsers()
   }
 
-  @Query(() => User)
+  @Query(() => UserSchema)
   findUserById (@Args({ name: 'userId', type: () => Int }) id: number) {
     return this.userService.findUserById(id)
   }
 
-  @Query(() => User)
+  @Query(() => UserSchema)
   findUserByMobile (
     @Args({ name: 'mobile', type: () => String }) mobile: string,
   ) {
@@ -68,13 +68,18 @@ export class UserResolver {
     return this.userService.deleteUser(id)
   }
 
-  @Mutation(() => String)
+  @Mutation(() => UserSchema)
+  registrationUser (@Args('addUserArgs') addUserArgs: AddUserArgs) {
+    return this.userService.addUser(addUserArgs)
+  }
+
+  @Mutation(() => UserSchema)
   addUser (@Args('addUserArgs') addUserArgs: AddUserArgs) {
     return this.userService.addUser(addUserArgs)
   }
 
-  @Mutation(() => String)
-  updateUser (@Args('updateUserArgs') updateUserArgs: UpdateUserArgs) {
-    return this.userService.updateUser(updateUserArgs)
+  @Mutation(() => UserSchema)
+  updateUser (@Args({ name: 'userId', type: () => Int }) id: number, @Args('updateUserArgs') updateUserArgs: UpdateUserArgs) {
+    return this.userService.updateUser(id, updateUserArgs)
   }
 }

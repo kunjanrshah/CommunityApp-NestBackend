@@ -1,10 +1,17 @@
-import { InputType, Field, Int, Float } from '@nestjs/graphql';
-import { Role } from '../schema/user.schema';
+import { Int, Field, ObjectType, Float, registerEnumType } from "@nestjs/graphql";
+import { Role } from '@prisma/client';
 
-@InputType()
-export class AddUserArgs {
-  
-  @Field(() => Role , { nullable: true })
+
+registerEnumType(Role, {
+  name: 'Role', // GraphQL name
+});
+
+@ObjectType()
+export class UserSchema {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => Role)
   role: Role;
 
   @Field(() => Int, { nullable: true })
@@ -38,7 +45,7 @@ export class AddUserArgs {
   first_name?: string;
 
   @Field(() => Int, { nullable: true })
-  last_name_id?: number;
+  last_name_id?: number; 
 
   @Field({ nullable: true })
   father_name?: string;
@@ -50,12 +57,12 @@ export class AddUserArgs {
   status: boolean;
 
   @Field({ nullable: true })
-  gender?: string;
+  gender?: string; 
 
   @Field({ nullable: true })
   phone?: string;
 
-  @Field({ defaultValue: 'noimage.png' })
+  @Field({ defaultValue: "noimage.png" })
   profile_pic: string;
 
   @Field({ nullable: true })
@@ -77,14 +84,14 @@ export class AddUserArgs {
   deleted: boolean;
 
   @Field({ nullable: true })
-  login_status?: boolean;
+  login_status?: boolean; 
 
   @Field({ nullable: true })
-  last_login?: Date;
+  last_login?: Date; 
 
   @Field({ nullable: true })
   profile_password?: string;
 
-  @Field(() => Int, { defaultValue: 5 })
+  @Field(() => Float, { defaultValue: 5 })
   profile_percent: number;
 }

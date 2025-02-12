@@ -2,7 +2,7 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type UserSchema {
   id: Int!
   role: Role!
   head_id: Int
@@ -37,9 +37,6 @@ type User {
 enum Role {
   ADMIN
   USER
-  SUPERADMIN
-  SUB_ADMIN
-  LOCAL_ADMIN
 }
 
 """
@@ -51,15 +48,16 @@ type Query {
   securedResourceforUser: String!
   securedResourceforAdmin: String!
   login(mobile: String!, password: String!): String!
-  getAllUsers: [User!]!
-  findUserById(userId: Int!): User!
-  findUserByMobile(mobile: String!): User!
+  getAllUsers: [UserSchema!]!
+  findUserById(userId: Int!): UserSchema!
+  findUserByMobile(mobile: String!): UserSchema!
 }
 
 type Mutation {
   deleteUserById(userId: Int!): String!
-  addUser(addUserArgs: AddUserArgs!): String!
-  updateUser(updateUserArgs: UpdateUserArgs!): String!
+  registrationUser(addUserArgs: AddUserArgs!): UserSchema!
+  addUser(addUserArgs: AddUserArgs!): UserSchema!
+  updateUser(userId: Int!, updateUserArgs: UpdateUserArgs!): UserSchema!
 }
 
 input AddUserArgs {
@@ -94,7 +92,6 @@ input AddUserArgs {
 }
 
 input UpdateUserArgs {
-  id: Int!
   role: Role
   head_id: Int
   member_code: String
@@ -109,18 +106,18 @@ input UpdateUserArgs {
   last_name_id: Int
   father_name: String
   mother_name: String
-  status: Boolean! = true
+  status: Boolean = true
   gender: String
   phone: String
-  profile_pic: String! = "noimage.png"
+  profile_pic: String = "noimage.png"
   region: String
-  is_expired: Boolean! = false
+  is_expired: Boolean = false
   expire_date: DateTime
   education_id: Int
   occupation_id: Int
-  deleted: Boolean! = false
+  deleted: Boolean = false
   login_status: Boolean
   last_login: DateTime
   profile_password: String
-  profile_percent: Int! = 5
+  profile_percent: Int = 5
 }

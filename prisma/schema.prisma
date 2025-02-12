@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// schema.prisma
+model User {
+  id                Int      @id @default(autoincrement())
+  role              Role
+  head_id           Int?     // Optional field
+  member_code       String?  @unique // Optional field
+  email_address     String?  // Optional field
+  mobile            String?  // Optional field
+  plain_password    String?  // Optional field
+  password          String?  // Optional field
+  relationship_id   Int?     // Optional field
+  sub_community_id  Int?     // Optional field
+  local_community_id Int?    // Optional field
+  first_name        String?  // Optional field
+  last_name_id      Int?     // Optional field
+  father_name       String?  // Optional field
+  mother_name       String?  // Optional field
+  status            Boolean  @default(true)
+  gender            String?  // Optional field
+  phone             String?  // Optional field
+  profile_pic       String   @default("noimage.png")
+  region            String?  // Optional field
+  is_expired        Boolean  @default(false)
+  expire_date       DateTime? // Optional field
+  education_id      Int?     // Optional field
+  occupation_id     Int?     // Optional field
+  deleted           Boolean  @default(false)
+  login_status      Boolean? // Optional field
+  last_login        DateTime? // Optional field
+  profile_password  String?  // Optional field
+  profile_percent   Float    @default(5)
+}
+
+
+// Enum for Role
+enum Role {
+  ADMIN
+  USER
+}

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
-import { RegistrationDTO } from './dto/registration.dto';
+import { RegistrationDTO } from './domain/user/dto/user.registration.dto';
 
 @Controller("API")
 export class AppController {
