@@ -3,12 +3,8 @@ import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-              @Module({
+@Module({
   controllers: [],
-
-
-
-
 
   providers: [UserResolver, UserService, PrismaService],
   exports: [UserService],
