@@ -41,6 +41,12 @@
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
   },
+  "eslintConfig": {
+    "extends": [
+      "plugin:unicorn/recommended",
+      "prettier"
+    ]
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.6.7",
     "@commitlint/config-conventional": "^17.6.7",

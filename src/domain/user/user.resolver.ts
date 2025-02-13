@@ -15,29 +15,14 @@ import { RegisterUserArgs } from './args/user.registration.args';
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-
-
-
   @Query(() => String)
   @UseGuards(JwtGuard, new RoleGuard(Role.USER))
   securedResourceforUser(@Context('user') user: UserSchema) {
-  
-  
-  
-  
     return 'This is Secured Resource' + JSON.stringify(user);
   }
 
   @Query(() => String)
-  
-  
-  
-  
   @UseGuards(JwtGuard, new RoleGuard(Role.ADMIN))
-  
-  
-  
-  
   securedResourceforAdmin(@Context('user') user: UserSchema) {
     return 'This is Secured Resource' + JSON.stringify(user);
   }

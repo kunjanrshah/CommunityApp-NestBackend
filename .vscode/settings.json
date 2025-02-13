@@ -6,7 +6,7 @@
   "workbench.tree.indent": 22,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "files.eol": "\n",
   "files.insertFinalNewline": true,
