@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+. "$(dirname "$0")/_/husky.sh"
+
+sh "$(dirname "$0")/_/pre-commit"
+
+npx lint-staged
