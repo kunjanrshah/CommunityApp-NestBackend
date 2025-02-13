@@ -6,31 +6,31 @@ import { RegisterUserArgs } from './args/user.registration.args';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor (private readonly prisma: PrismaService) {}
 
-  async login(mobile: string, password: string) {
+  async login (mobile: string, password: string) {
     const user = await this.prisma.user.findFirst({
       where: { mobile, password },
     });
     return user;
   }
 
-  async getAllUsers() {
+  async getAllUsers () {
     const users = await this.prisma.user.findMany();
     return users;
   }
 
-  async findUserById(id: number) {
+  async findUserById (id: number) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     return user;
   }
 
-  async findUserByMobile(mobile: string) {
+  async findUserByMobile (mobile: string) {
     const user = await this.prisma.user.findFirst({ where: { mobile } });
     return user;
   }
 
-  async deleteUser(id: number): Promise<string> {
+  async deleteUser (id: number): Promise<string> {
     try {
       await this.prisma.user.delete({
         where: { id },
@@ -41,19 +41,19 @@ export class UserService {
     }
   }
 
-  async addUser(addUserArgs: AddUserArgs) {
+  async addUser (addUserArgs: AddUserArgs) {
     return await this.prisma.user.create({
       data: { ...addUserArgs },
     });
   }
 
-  async registerUser(registerUserArgs: RegisterUserArgs) {
+  async registerUser (registerUserArgs: RegisterUserArgs) {
     return await this.prisma.user.create({
       data: { ...registerUserArgs },
     });
   }
 
-  async updateUser(id: number, updateUserArgs: UpdateUserArgs) {
+  async updateUser (id: number, updateUserArgs: UpdateUserArgs) {
     return await this.prisma.user.update({
       where: { id },
       data: { ...updateUserArgs },
