@@ -4,5 +4,4 @@
 
 sh "$(dirname "$0")/_/pre-commit-msg"
 
-if [ "$NO_VERIFY" ] || [ "$NO_VERIFY_YOLO" ]; then exit 0; fi
 exec < /dev/tty && node_modules/.bin/cz --hook || true
