@@ -4,5 +4,4 @@
 
 npx --no -- commitlint --edit "$1"
 
-#sh "$(dirname "$0")/_/commit-msg" "$@"
 

@@ -2,8 +2,6 @@
 
 . "$(dirname "$0")/_/husky.sh"
 
-sh "$(dirname "$0")/_/pre-commit"
-
 npx prettier --write .  # Format code before committing
 npx eslint --fix .      # Fix linting issues
 git add .              # Add formatted files
