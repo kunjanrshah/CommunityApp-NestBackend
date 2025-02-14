@@ -4,5 +4,6 @@
 
 sh "$(dirname "$0")/_/pre-commit"
 
-if [ "$NO_VERIFY_YOLO" ]; then exit 0; fi
-npm run lint && npm run prettier
+npx prettier --write .  # Format code before committing
+npx eslint --fix .      # Fix linting issues
+git add .              # Add formatted files
