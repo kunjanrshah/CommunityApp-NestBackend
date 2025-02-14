@@ -18,3 +18,4 @@ dist
 /apps/**/dist
 /infra/**/build
 /infra/**/dist
+src/schema.gql
