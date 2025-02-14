@@ -2,6 +2,7 @@
 
 . "$(dirname "$0")/_/husky.sh"
 
+#npx husky add .husky/pre-commit "npx check-node-version --node \">=20.0.0\" --npm \">=8.0.0\""
 npx prettier --write .  # Format code before committing
 npx eslint --fix .      # Fix linting issues
 git add .              # Add formatted files
