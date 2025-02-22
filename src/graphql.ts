@@ -13,22 +13,21 @@ export enum Role {
 }
 
 export interface AddUserArgs {
-  role?: Nullable<Role>;
-  head_id?: Nullable<number>;
+  role: Role;
+  head_id: number;
   member_code?: Nullable<string>;
   email_address?: Nullable<string>;
   mobile?: Nullable<string>;
-  plain_password?: Nullable<string>;
-  password?: Nullable<string>;
+  password: string;
   relationship_id?: Nullable<number>;
-  sub_community_id?: Nullable<number>;
-  local_community_id?: Nullable<number>;
-  first_name?: Nullable<string>;
-  last_name_id?: Nullable<number>;
+  sub_community_id: number;
+  local_community_id: number;
+  first_name: string;
+  last_name_id: number;
   father_name?: Nullable<string>;
-  mother_name?: Nullable<string>;
+  mother_name: string;
   status: boolean;
-  gender?: Nullable<boolean>;
+  gender: boolean;
   phone?: Nullable<string>;
   profile_pic: string;
   region?: Nullable<string>;
@@ -39,7 +38,6 @@ export interface AddUserArgs {
   deleted: boolean;
   login_status?: Nullable<boolean>;
   last_login?: Nullable<DateTime>;
-  profile_password?: Nullable<string>;
   profile_percent: number;
 }
 
@@ -51,11 +49,11 @@ export interface RegisterUserArgs {
   password: string;
   sub_community_id: number;
   local_community_id: number;
+  gender: boolean;
+  profile_pic: string;
   state_id: number;
   city_id: number;
   address: string;
-  gender: boolean;
-  profile_pic: string;
 }
 
 export interface UpdateUserArgs {
@@ -64,7 +62,6 @@ export interface UpdateUserArgs {
   member_code?: Nullable<string>;
   email_address?: Nullable<string>;
   mobile?: Nullable<string>;
-  plain_password?: Nullable<string>;
   password?: Nullable<string>;
   relationship_id?: Nullable<number>;
   sub_community_id?: Nullable<number>;
@@ -85,28 +82,26 @@ export interface UpdateUserArgs {
   deleted?: Nullable<boolean>;
   login_status?: Nullable<boolean>;
   last_login?: Nullable<DateTime>;
-  profile_password?: Nullable<string>;
   profile_percent?: Nullable<number>;
 }
 
 export interface UserSchema {
   id: number;
   role: Role;
-  head_id?: Nullable<number>;
+  head_id: number;
   member_code?: Nullable<string>;
   email_address?: Nullable<string>;
   mobile?: Nullable<string>;
-  plain_password?: Nullable<string>;
-  password?: Nullable<string>;
+  password: string;
   relationship_id?: Nullable<number>;
   sub_community_id?: Nullable<number>;
   local_community_id?: Nullable<number>;
-  first_name?: Nullable<string>;
-  last_name_id?: Nullable<number>;
+  first_name: string;
+  last_name_id: number;
   father_name?: Nullable<string>;
   mother_name?: Nullable<string>;
   status: boolean;
-  gender?: Nullable<string>;
+  gender: string;
   phone?: Nullable<string>;
   profile_pic: string;
   region?: Nullable<string>;
@@ -117,7 +112,6 @@ export interface UserSchema {
   deleted: boolean;
   login_status?: Nullable<boolean>;
   last_login?: Nullable<DateTime>;
-  profile_password?: Nullable<string>;
   profile_percent: number;
 }
 
@@ -132,7 +126,6 @@ export interface IQuery {
 
 export interface IMutation {
   deleteUserById(userId: number): string | Promise<string>;
-  registrationUser(addUserArgs: AddUserArgs): UserSchema | Promise<UserSchema>;
   addUser(addUserArgs: AddUserArgs): UserSchema | Promise<UserSchema>;
   registerUser(registerUserArgs: RegisterUserArgs): UserSchema | Promise<UserSchema>;
   updateUser(userId: number, updateUserArgs: UpdateUserArgs): UserSchema | Promise<UserSchema>;

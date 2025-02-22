@@ -10,11 +10,11 @@ export class UserSchema {
   @Field(() => Int)
   id: number;
 
-  @Field(() => Role)
+  @Field(() => Role, { defaultValue: Role.USER })
   role: Role;
 
-  @Field(() => Int, { nullable: true })
-  head_id?: number;
+  @Field(() => Int, { defaultValue: 0 })
+  head_id: number;
 
   @Field({ nullable: true })
   member_code?: string;
@@ -25,11 +25,8 @@ export class UserSchema {
   @Field({ nullable: true })
   mobile?: string;
 
-  @Field({ nullable: true })
-  plain_password?: string;
-
-  @Field({ nullable: true })
-  password?: string;
+  @Field()
+  password: string;
 
   @Field(() => Int, { nullable: true })
   relationship_id?: number;
@@ -40,11 +37,11 @@ export class UserSchema {
   @Field(() => Int, { nullable: true })
   local_community_id?: number;
 
-  @Field({ nullable: true })
-  first_name?: string;
+  @Field()
+  first_name: string;
 
-  @Field(() => Int, { nullable: true })
-  last_name_id?: number;
+  @Field(() => Int)
+  last_name_id: number;
 
   @Field({ nullable: true })
   father_name?: string;
@@ -55,8 +52,8 @@ export class UserSchema {
   @Field({ defaultValue: true })
   status: boolean;
 
-  @Field({ nullable: true })
-  gender?: string;
+  @Field()
+  gender: string;
 
   @Field({ nullable: true })
   phone?: string;
@@ -87,9 +84,6 @@ export class UserSchema {
 
   @Field({ nullable: true })
   last_login?: Date;
-
-  @Field({ nullable: true })
-  profile_password?: string;
 
   @Field(() => Float, { defaultValue: 5 })
   profile_percent: number;

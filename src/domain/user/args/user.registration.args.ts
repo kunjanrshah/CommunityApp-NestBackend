@@ -1,40 +1,44 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
+import { IsEmail, Length } from 'class-validator';
 
 @InputType()
 export class RegisterUserArgs {
   @Field()
-  first_name?: string;
+  first_name: string;
 
   @Field(() => Int)
-  last_name_id?: number;
+  last_name_id: number;
 
   @Field()
-  email_address?: string;
+  @IsEmail({}, { message: 'Invalid email format' })
+  email_address: string;
 
   @Field()
-  mobile?: string;
+  @Length(6, 15, { message: 'Mobile must be between 6 and 15 characters' })
+  mobile: string;
 
   @Field()
-  password?: string;
+  @Length(6, 15, { message: 'Password must be between 6 and 15 characters' })
+  password: string;
 
   @Field(() => Int)
-  sub_community_id?: number;
+  sub_community_id: number;
 
   @Field(() => Int)
-  local_community_id?: number;
-
-  @Field(() => Int)
-  state_id?: number;
-
-  @Field(() => Int)
-  city_id?: number;
-
-  @Field()
-  address?: string;
+  local_community_id: number;
 
   @Field(() => Boolean)
-  gender?: boolean;
+  gender: boolean;
 
   @Field({ defaultValue: 'noimage.png' })
   profile_pic: string;
+
+  @Field(() => Int)
+  state_id: number;
+
+  @Field(() => Int)
+  city_id: number;
+
+  @Field()
+  address: string;
 }

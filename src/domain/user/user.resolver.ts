@@ -6,28 +6,29 @@ import { UpdateUserArgs } from './args/user.update.args';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import * as jwt from 'jsonwebtoken';
-import { JwtGuard } from 'src/auth/jwt.guard';
 import { Role } from 'src/graphql';
 import { RoleGuard } from 'src/auth/role.guard';
 import { RegisterUserArgs } from './args/user.registration.args';
+import { Public } from 'src/public.decorator';
 
 @Resolver(() => UserSchema)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => String)
-  @UseGuards(JwtGuard, new RoleGuard(Role.USER))
+  @UseGuards(new RoleGuard(Role.USER))
   securedResourceforUser(@Context('user') user: UserSchema) {
     return 'This is Secured Resource' + JSON.stringify(user);
   }
 
   @Query(() => String)
-  @UseGuards(JwtGuard, new RoleGuard(Role.ADMIN))
+  @UseGuards(new RoleGuard(Role.ADMIN))
   securedResourceforAdmin(@Context('user') user: UserSchema) {
     return 'This is Secured Resource' + JSON.stringify(user);
   }
 
   @Query(() => String)
+  @Public()
   @UseGuards(AuthGuard)
   login(
     @Args({ name: 'mobile', type: () => String }) mobile: string,
@@ -68,16 +69,12 @@ export class UserResolver {
   }
 
   @Mutation(() => UserSchema)
-  registrationUser(@Args('addUserArgs') addUserArgs: AddUserArgs) {
-    return this.userService.addUser(addUserArgs);
-  }
-
-  @Mutation(() => UserSchema)
   addUser(@Args('addUserArgs') addUserArgs: AddUserArgs) {
     return this.userService.addUser(addUserArgs);
   }
 
   @Mutation(() => UserSchema)
+  @Public()
   registerUser(@Args('registerUserArgs') registerUserArgs: RegisterUserArgs) {
     return this.userService.registerUser(registerUserArgs);
   }

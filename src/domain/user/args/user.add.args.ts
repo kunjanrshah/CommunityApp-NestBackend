@@ -1,55 +1,61 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 
 @InputType()
 export class AddUserArgs {
-  @Field(() => Role, { nullable: true })
+  @Field(() => Role, { defaultValue: Role.USER })
   role: Role;
 
-  @Field(() => Int, { nullable: true })
-  head_id?: number;
+  @Field(() => Int, { defaultValue: 0 })
+  head_id: number;
 
   @Field({ nullable: true })
   member_code?: string;
 
   @Field({ nullable: true })
+  @IsEmail({}, { message: 'Invalid email format' })
   email_address?: string;
 
   @Field({ nullable: true })
+  @IsNotEmpty({ message: 'Mobile should not be empty' })
+  @Length(6, 15, { message: 'Mobile must be between 6 and 15 characters' })
   mobile?: string;
 
-  @Field({ nullable: true })
-  plain_password?: string;
-
-  @Field({ nullable: true })
-  password?: string;
+  @Field()
+  @IsNotEmpty({ message: 'Password should not be empty' })
+  @Length(6, 20, { message: 'Password must be between 6 and 20 characters' })
+  password: string;
 
   @Field(() => Int, { nullable: true })
   relationship_id?: number;
 
-  @Field(() => Int, { nullable: true })
-  sub_community_id?: number;
+  @Field(() => Int)
+  sub_community_id: number;
 
-  @Field(() => Int, { nullable: true })
-  local_community_id?: number;
+  @Field(() => Int)
+  local_community_id: number;
+
+  @Field()
+  @IsNotEmpty({ message: 'FirstName should not be empty' })
+  first_name: string;
+
+  @Field(() => Int)
+  last_name_id: number;
 
   @Field({ nullable: true })
-  first_name?: string;
-
-  @Field(() => Int, { nullable: true })
-  last_name_id?: number;
-
-  @Field({ nullable: true })
+  @IsNotEmpty({ message: 'FatherName should not be empty' })
   father_name?: string;
 
-  @Field({ nullable: true })
+  @Field()
+  @IsNotEmpty({ message: 'MotherName should not be empty' })
   mother_name?: string;
 
   @Field({ defaultValue: true })
   status: boolean;
 
-  @Field({ nullable: true })
-  gender?: boolean;
+  @Field()
+  gender: boolean;
 
   @Field({ nullable: true })
   phone?: string;
@@ -80,9 +86,6 @@ export class AddUserArgs {
 
   @Field({ nullable: true })
   last_login?: Date;
-
-  @Field({ nullable: true })
-  profile_password?: string;
 
   @Field(() => Int, { defaultValue: 5 })
   profile_percent: number;
