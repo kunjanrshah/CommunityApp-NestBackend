@@ -7,6 +7,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GqlAuthGuard } from './auth.guard';
 import { Reflector } from '@nestjs/core';
+import { RolesGuard } from './roles.guard';
 
 @Module({
   imports: [
@@ -17,7 +18,15 @@ import { Reflector } from '@nestjs/core';
     }),
   ],
   controllers: [],
-  providers: [AuthService, JwtStrategy, PrismaService, AuthResolver, GqlAuthGuard, Reflector],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    PrismaService,
+    AuthResolver,
+    RolesGuard,
+    GqlAuthGuard,
+    Reflector,
+  ],
   exports: [AuthService, JwtModule, GqlAuthGuard],
 })
 export class AuthModule {}

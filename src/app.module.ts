@@ -31,13 +31,6 @@ import { DomainModule } from './domain/domain.module';
     }),
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    PrismaService,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: GqlAuthGuard, // 👈 Apply authentication globally
-    // },
-  ],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
