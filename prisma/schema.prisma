@@ -21,8 +21,8 @@ model User {
   role               Role      @default(USER)
   head_id            Int       @default(0)
   member_code        String?   @unique // Optional field
-  email_address      String? // Optional field
-  mobile             String? // Optional field
+  email              String?   @unique // Optional field
+  mobile             String?   @unique // Optional field
   password           String
   relationship_id    Int? // Optional field
   sub_community_id   Int

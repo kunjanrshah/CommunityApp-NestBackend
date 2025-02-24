@@ -20,7 +20,7 @@ export class UserSchema {
   member_code?: string;
 
   @Field({ nullable: true })
-  email_address?: string;
+  email?: string;
 
   @Field({ nullable: true })
   mobile?: string;

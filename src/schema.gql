@@ -2,12 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+  message: String!
+}
+
 type UserSchema {
   id: Int!
   role: Role!
   head_id: Int!
   member_code: String
-  email_address: String
+  email: String
   mobile: String
   password: String!
   relationship_id: Int
@@ -42,27 +48,34 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type ChangePasswordResponse {
+  message: String!
+}
+
 type Query {
-  securedResourceforUser: String!
-  securedResourceforAdmin: String!
-  login(mobile: String!, password: String!): String!
-  getAllUsers: [UserSchema!]!
+  getProtectedData: String!
   findUserById(userId: Int!): UserSchema!
   findUserByMobile(mobile: String!): UserSchema!
+  getAllUsers: [UserSchema!]!
+  securedResourceforUser: String!
+  securedResourceforAdmin: String!
 }
 
 type Mutation {
   deleteUserById(userId: Int!): String!
   addUser(addUserArgs: AddUserArgs!): UserSchema!
-  registerUser(registerUserArgs: RegisterUserArgs!): UserSchema!
   updateUser(userId: Int!, updateUserArgs: UpdateUserArgs!): UserSchema!
+  changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
+  register(input: RegisterInput!): AuthResponse!
+  login(input: LoginInput!): AuthResponse!
+  refreshToken(token: String!): AuthResponse!
 }
 
 input AddUserArgs {
   role: Role! = USER
   head_id: Int! = 0
   member_code: String
-  email_address: String
+  email: String
   mobile: String
   password: String!
   relationship_id: Int
@@ -87,26 +100,11 @@ input AddUserArgs {
   profile_percent: Int! = 5
 }
 
-input RegisterUserArgs {
-  first_name: String!
-  last_name_id: Int!
-  email_address: String!
-  mobile: String!
-  password: String!
-  sub_community_id: Int!
-  local_community_id: Int!
-  gender: Boolean!
-  profile_pic: String! = "noimage.png"
-  state_id: Int!
-  city_id: Int!
-  address: String!
-}
-
 input UpdateUserArgs {
   role: Role = USER
   head_id: Int = 0
   member_code: String
-  email_address: String
+  email: String
   mobile: String
   password: String
   relationship_id: Int
@@ -129,4 +127,29 @@ input UpdateUserArgs {
   login_status: Boolean
   last_login: DateTime
   profile_percent: Int = 5
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+input RegisterInput {
+  first_name: String!
+  last_name_id: Int!
+  email: String!
+  mobile: String!
+  password: String!
+  sub_community_id: Int!
+  local_community_id: Int!
+  gender: Boolean!
+  profile_pic: String! = "noimage.png"
+  state_id: Int!
+  city_id: Int!
+  address: String!
+}
+
+input LoginInput {
+  mobile: String!
+  password: String!
 }

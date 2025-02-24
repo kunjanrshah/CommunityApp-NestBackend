@@ -1,8 +1,8 @@
-import { InputType, Field, Int } from '@nestjs/graphql';
+import { InputType, Field, Int, ObjectType } from '@nestjs/graphql';
 import { IsEmail, Length } from 'class-validator';
 
 @InputType()
-export class RegisterUserArgs {
+export class RegisterInput {
   @Field()
   first_name: string;
 
@@ -11,7 +11,7 @@ export class RegisterUserArgs {
 
   @Field()
   @IsEmail({}, { message: 'Invalid email format' })
-  email_address: string;
+  email: string;
 
   @Field()
   @Length(6, 15, { message: 'Mobile must be between 6 and 15 characters' })
@@ -41,4 +41,16 @@ export class RegisterUserArgs {
 
   @Field()
   address: string;
+}
+
+@ObjectType()
+export class AuthResponse {
+  @Field()
+  accessToken: string;
+
+  @Field()
+  refreshToken: string;
+
+  @Field()
+  message: string;
 }

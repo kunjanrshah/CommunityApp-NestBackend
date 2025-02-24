@@ -1,29 +1,11 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { UserService } from 'src/domain/user/user.service';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
-  constructor(private readonly userService: UserService) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const ctx = GqlExecutionContext.create(context).getContext();
-    console.log('Request Body:', ctx.req.body);
-
-    const { mobile, password } = ctx.req.body.variables;
-
-    const user = await this.userService.findUserByMobile(mobile);
-    if (user && user.password === password) {
-      ctx.user = user;
-      return true;
-    } else {
-      throw new HttpException('UnAuthenticated', HttpStatus.NOT_FOUND);
-    }
+export class GqlAuthGuard extends AuthGuard('jwt') {
+  getRequest(context: ExecutionContext) {
+    const ctx = GqlExecutionContext.create(context);
+    return ctx.getContext().req;
   }
 }

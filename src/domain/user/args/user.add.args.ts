@@ -15,7 +15,7 @@ export class AddUserArgs {
 
   @Field({ nullable: true })
   @IsEmail({}, { message: 'Invalid email format' })
-  email_address?: string;
+  email?: string;
 
   @Field({ nullable: true })
   @IsNotEmpty({ message: 'Mobile should not be empty' })
