@@ -7,7 +7,7 @@ import { UseGuards } from '@nestjs/common';
 import { Role } from 'src/graphql';
 import { ChangePasswordInput, ChangePasswordResponse } from './args/user.change-password.args';
 import { GqlAuthGuard } from 'src/auth/auth.guard';
-import { Roles } from 'src/auth/roles.decorator';
+import { Roles } from 'src/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 
 @Resolver(() => UserSchema)
