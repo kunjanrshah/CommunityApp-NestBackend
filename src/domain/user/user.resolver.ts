@@ -6,7 +6,6 @@ import { UpdateUserArgs } from './args/user.update.args';
 import { UseGuards } from '@nestjs/common';
 import { Role } from 'src/graphql';
 import { ChangePasswordInput, ChangePasswordResponse } from './args/user.change-password.args';
-import { GqlAuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 
@@ -54,19 +53,18 @@ export class UserResolver {
 
   @Query(() => String)
   @Roles(Role.USER)
-  @UseGuards(GqlAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   securedResourceforUser(@Context('user') user: UserSchema) {
     return 'This is Secured Resource' + JSON.stringify(user);
   }
 
   @Query(() => String)
   @Roles(Role.ADMIN)
-  @UseGuards(GqlAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   securedResourceforAdmin(@Context('user') user: UserSchema) {
     return 'This is Secured Resource' + JSON.stringify(user);
   }
 
-  @UseGuards(GqlAuthGuard)
   @Mutation(() => ChangePasswordResponse)
   async changePassword(@Args('input') input: ChangePasswordInput, @Context() context) {
     const userId = context.req.user.userId; // Extract user ID from token
