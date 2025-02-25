@@ -3,11 +3,9 @@ import { UserSchema } from './schema/user.schema';
 import { UserService } from './user.service';
 import { AddUserArgs } from './args/user.add.args';
 import { UpdateUserArgs } from './args/user.update.args';
-import { UseGuards } from '@nestjs/common';
 import { Role } from 'src/graphql';
 import { ChangePasswordInput, ChangePasswordResponse } from './args/user.change-password.args';
 import { Roles } from 'src/roles.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
 
 @Resolver(() => UserSchema)
 export class UserResolver {
@@ -53,14 +51,12 @@ export class UserResolver {
 
   @Query(() => String)
   @Roles(Role.USER)
-  @UseGuards(RolesGuard)
   securedResourceforUser(@Context('user') user: UserSchema) {
     return 'This is Secured Resource' + JSON.stringify(user);
   }
 
   @Query(() => String)
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   securedResourceforAdmin(@Context('user') user: UserSchema) {
     return 'This is Secured Resource' + JSON.stringify(user);
   }
