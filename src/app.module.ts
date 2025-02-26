@@ -28,6 +28,17 @@ import { DomainModule } from './domain/domain.module';
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
       },
+      // formatError: (error) => {
+      //   return {
+      //     message: error.message,
+      //     extensions: {
+      //       code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+      //       timestamp: new Date().toISOString(),
+      //       status: error.extensions?.status || 500,
+      //       path: 'GraphQL',
+      //     },
+      //   };
+      // },
     }),
   ],
   controllers: [AppController],
