@@ -5,25 +5,29 @@ import { AuthResponse, RegisterInput } from 'src/domain/user/args/user.register.
 import { Public } from 'src/public.decorator';
 
 @Resolver()
-@Public()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Public() // 👈 Skips authentication for this resolver
+  @Public()
   @Mutation(() => AuthResponse)
-  async register(@Args('input') input: RegisterInput) {
-    return this.authService.register(input);
+  async register(@Args('RegisterInput') registerInput: RegisterInput) {
+    return this.authService.register(registerInput);
   }
 
-  @Public() // 👈 Skips authentication for this resolver
+  @Public()
   @Mutation(() => AuthResponse)
-  async login(@Args('input') input: LoginInput) {
-    return this.authService.login(input.mobile, input.password);
+  async login(@Args('LoginInput') loginInput: LoginInput) {
+    return this.authService.login(loginInput.mobile, loginInput.password);
   }
 
-  @Public() // 👈 Skips authentication for this resolver
+  @Public()
   @Mutation(() => AuthResponse)
   async refreshToken(@Args('token') token: string) {
     return this.authService.refreshToken(token);
   }
+
+  // @Mutation(() => String)
+  // async forgotPassword (@Args('email') email: string) {
+  //   return this.authService.forgotPassword(email);
+  // }
 }

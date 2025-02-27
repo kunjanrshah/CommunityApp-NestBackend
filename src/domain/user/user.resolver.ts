@@ -62,8 +62,15 @@ export class UserResolver {
   }
 
   @Mutation(() => ChangePasswordResponse)
-  async changePassword(@Args('input') input: ChangePasswordInput, @Context() context) {
+  async changePassword(
+    @Args('ChangePasswordInput') changePasswordInput: ChangePasswordInput,
+    @Context() context,
+  ) {
     const userId = context.req.user.userId; // Extract user ID from token
-    return this.userService.changePassword(userId, input.currentPassword, input.newPassword);
+    return this.userService.changePassword(
+      userId,
+      changePasswordInput.currentPassword,
+      changePasswordInput.newPassword,
+    );
   }
 }

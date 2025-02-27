@@ -16,7 +16,7 @@ export class AuthService {
   async register(input: RegisterInput) {
     try {
       const mobile = input.mobile;
-      const existingUser = await this.prisma.user.findUnique({ where: { mobile } });
+      const existingUser = await this.prisma.user.findFirst({ where: { mobile } });
       if (existingUser) {
         throw new BadRequestException('Mobile is already registered');
       }
@@ -56,14 +56,14 @@ export class AuthService {
   }
 
   async validateUser(mobile: string, password: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findFirst({
       where: { mobile },
     });
 
     if (!user) {
       throw new UnauthorizedException('Invalid mobile');
     }
-
+    console.log('kunjan: ', password, mobile);
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');

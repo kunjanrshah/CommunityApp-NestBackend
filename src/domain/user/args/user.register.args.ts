@@ -1,12 +1,14 @@
 import { InputType, Field, Int, ObjectType } from '@nestjs/graphql';
-import { IsEmail, Length } from 'class-validator';
+import { IsBoolean, IsEmail, IsNumber, IsString, Length } from 'class-validator';
 
 @InputType()
 export class RegisterInput {
   @Field()
+  @IsString()
   first_name: string;
 
   @Field(() => Int)
+  @IsNumber()
   last_name_id: number;
 
   @Field()
@@ -14,7 +16,7 @@ export class RegisterInput {
   email: string;
 
   @Field()
-  @Length(6, 15, { message: 'Mobile must be between 6 and 15 characters' })
+  @Length(6, 10, { message: 'Mobile must be between 6 and 10 characters' })
   mobile: string;
 
   @Field()
@@ -22,24 +24,31 @@ export class RegisterInput {
   password: string;
 
   @Field(() => Int)
+  @IsNumber()
   sub_community_id: number;
 
   @Field(() => Int)
+  @IsNumber()
   local_community_id: number;
 
   @Field(() => Boolean)
+  @IsBoolean()
   gender: boolean;
 
   @Field({ defaultValue: 'noimage.png' })
+  @IsString()
   profile_pic: string;
 
   @Field(() => Int)
+  @IsNumber()
   state_id: number;
 
   @Field(() => Int)
+  @IsNumber()
   city_id: number;
 
   @Field()
+  @IsString()
   address: string;
 }
 
@@ -48,8 +57,8 @@ export class AuthResponse {
   @Field()
   accessToken: string;
 
-  @Field()
-  refreshToken: string;
+  @Field({ nullable: true })
+  refreshToken?: string;
 
   @Field()
   message: string;

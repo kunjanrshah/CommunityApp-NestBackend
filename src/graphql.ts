@@ -98,7 +98,7 @@ export interface LoginInput {
 
 export interface AuthResponse {
     accessToken: string;
-    refreshToken: string;
+    refreshToken?: Nullable<string>;
     message: string;
 }
 
@@ -149,9 +149,9 @@ export interface IMutation {
     deleteUserById(userId: number): string | Promise<string>;
     addUser(addUserArgs: AddUserArgs): UserSchema | Promise<UserSchema>;
     updateUser(userId: number, updateUserArgs: UpdateUserArgs): UserSchema | Promise<UserSchema>;
-    changePassword(input: ChangePasswordInput): ChangePasswordResponse | Promise<ChangePasswordResponse>;
-    register(input: RegisterInput): AuthResponse | Promise<AuthResponse>;
-    login(input: LoginInput): AuthResponse | Promise<AuthResponse>;
+    changePassword(ChangePasswordInput: ChangePasswordInput): ChangePasswordResponse | Promise<ChangePasswordResponse>;
+    register(RegisterInput: RegisterInput): AuthResponse | Promise<AuthResponse>;
+    login(LoginInput: LoginInput): AuthResponse | Promise<AuthResponse>;
     refreshToken(token: string): AuthResponse | Promise<AuthResponse>;
 }
 

@@ -4,7 +4,7 @@
 
 type AuthResponse {
   accessToken: String!
-  refreshToken: String!
+  refreshToken: String
   message: String!
 }
 
@@ -65,9 +65,9 @@ type Mutation {
   deleteUserById(userId: Int!): String!
   addUser(addUserArgs: AddUserArgs!): UserSchema!
   updateUser(userId: Int!, updateUserArgs: UpdateUserArgs!): UserSchema!
-  changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
-  register(input: RegisterInput!): AuthResponse!
-  login(input: LoginInput!): AuthResponse!
+  changePassword(ChangePasswordInput: ChangePasswordInput!): ChangePasswordResponse!
+  register(RegisterInput: RegisterInput!): AuthResponse!
+  login(LoginInput: LoginInput!): AuthResponse!
   refreshToken(token: String!): AuthResponse!
 }
 
