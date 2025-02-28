@@ -66,6 +66,7 @@ export class AuthResolver {
   async resetPassword(@Args('resetPasswordInput') resetPasswordInput: ResetPasswordInput) {
     const { token, password } = resetPasswordInput;
 
+    // If we dont have DB then its other technic to retrive user
     //  const payload = this.jwtService.verify(token);
     // const userId = payload.userId;
 

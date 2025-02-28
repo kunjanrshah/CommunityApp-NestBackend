@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma/prisma.service';
 import { DomainModule } from './domain/domain.module';
+import dbConfig from './config/database';
 
 // Use NODE_ENV to load appropriate file
 // NODE_ENV=dev npm run start:dev
@@ -17,6 +18,7 @@ import { DomainModule } from './domain/domain.module';
     ConfigModule.forRoot({
       isGlobal: true, // Makes the config available globally
       envFilePath: `.env.${process.env.NODE_ENV || 'dev'}`,
+      load: [dbConfig],
     }),
     DomainModule,
     AuthModule,
