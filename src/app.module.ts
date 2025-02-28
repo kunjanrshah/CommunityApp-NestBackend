@@ -28,6 +28,7 @@ import { DomainModule } from './domain/domain.module';
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
       },
+      context: ({ req }) => ({ req }),
       // formatError: (error) => {
       //   return {
       //     message: error.message,

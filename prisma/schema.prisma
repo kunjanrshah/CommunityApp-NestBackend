@@ -44,6 +44,8 @@ model User {
   login_status       Boolean? // Optional field
   last_login         DateTime? // Optional field
   profile_percent    Float     @default(5)
+  resetToken         String? // Token for password reset
+  resetTokenExpiry   DateTime? // Expiry for reset token
 }
 
 model UserAddress {
