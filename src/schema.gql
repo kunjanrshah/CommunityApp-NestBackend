@@ -8,6 +8,25 @@ type AuthResponse {
   message: String!
 }
 
+type UserAddress {
+  id: Int!
+  user_id: Int!
+  address: String!
+  city_id: Int!
+  state_id: Int!
+  local_address: String
+  mosaad_id: Int
+  area: String
+  pincode: String
+  addr_type: AddrType!
+}
+
+"""The type of address (OWN or RENTED)"""
+enum AddrType {
+  OWN
+  RENTED
+}
+
 type UserSchema {
   id: Int!
   role: Role!
@@ -16,7 +35,7 @@ type UserSchema {
   email: String
   mobile: String
   password: String!
-  relationship_id: Int
+  relation_id: Int
   sub_community_id: Int
   local_community_id: Int
   first_name: String!
@@ -36,6 +55,7 @@ type UserSchema {
   login_status: Boolean
   last_login: DateTime
   profile_percent: Float!
+  address: UserAddress
 }
 
 enum Role {
@@ -53,19 +73,12 @@ type ChangePasswordResponse {
 }
 
 type Query {
-  getProtectedData: String!
-  findUserById(userId: Int!): UserSchema!
-  findUserByMobile(mobile: String!): UserSchema!
-  getAllUsers: [UserSchema!]!
-  securedResourceforUser: String!
   securedResourceforAdmin: String!
 }
 
 type Mutation {
-  deleteUserById(userId: Int!): String!
-  addUser(addUserArgs: AddUserArgs!): UserSchema!
-  updateUser(userId: Int!, updateUserArgs: UpdateUserArgs!): UserSchema!
   changePassword(ChangePasswordInput: ChangePasswordInput!): ChangePasswordResponse!
+  upsertUser(upsertUserInput: UpsertUserInput!): UserSchema!
   register(RegisterInput: RegisterInput!): AuthResponse!
   login(LoginInput: LoginInput!): AuthResponse!
   refreshToken(token: String!): AuthResponse!
@@ -73,22 +86,29 @@ type Mutation {
   resetPassword(resetPasswordInput: ResetPasswordInput!): String!
 }
 
-input AddUserArgs {
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+input UpsertUserInput {
+  user_id: Int
+  address_id: Int
   role: Role! = USER
-  head_id: Int! = 0
+  head_id: Int
   member_code: String
   email: String
   mobile: String
-  password: String!
-  relationship_id: Int
-  sub_community_id: Int!
-  local_community_id: Int!
-  first_name: String!
-  last_name_id: Int!
+  password: String
+  relation_id: Int
+  sub_community_id: Int
+  local_community_id: Int
+  first_name: String
+  last_name_id: Int
   father_name: String
-  mother_name: String!
+  mother_name: String
   status: Boolean! = true
-  gender: Boolean!
+  gender: Boolean
   phone: String
   profile_pic: String! = "noimage.png"
   region: String
@@ -100,40 +120,14 @@ input AddUserArgs {
   login_status: Boolean
   last_login: DateTime
   profile_percent: Int! = 5
-}
-
-input UpdateUserArgs {
-  role: Role = USER
-  head_id: Int = 0
-  member_code: String
-  email: String
-  mobile: String
-  password: String
-  relationship_id: Int
-  sub_community_id: Int
-  local_community_id: Int
-  first_name: String
-  last_name_id: Int
-  father_name: String
-  mother_name: String
-  status: Boolean = true
-  gender: Boolean
-  phone: String
-  profile_pic: String = "noimage.png"
-  region: String
-  is_expired: Boolean = false
-  expire_date: DateTime
-  education_id: Int
-  occupation_id: Int
-  deleted: Boolean = false
-  login_status: Boolean
-  last_login: DateTime
-  profile_percent: Int = 5
-}
-
-input ChangePasswordInput {
-  currentPassword: String!
-  newPassword: String!
+  city_id: Int
+  state_id: Int
+  addr_type: AddrType! = OWN
+  address: String
+  area: String
+  pincode: String
+  local_address: String
+  mosaad_id: Int
 }
 
 input RegisterInput {

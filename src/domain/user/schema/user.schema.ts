@@ -1,5 +1,6 @@
 import { Int, Field, ObjectType, Float, registerEnumType } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
+import { UserAddress } from './user-address.schema';
 
 registerEnumType(Role, {
   name: 'Role', // GraphQL name
@@ -29,7 +30,7 @@ export class UserSchema {
   password: string;
 
   @Field(() => Int, { nullable: true })
-  relationship_id?: number;
+  relation_id?: number;
 
   @Field(() => Int, { nullable: true })
   sub_community_id?: number;
@@ -87,4 +88,7 @@ export class UserSchema {
 
   @Field(() => Float, { defaultValue: 5 })
   profile_percent: number;
+
+  @Field(() => UserAddress, { nullable: true }) // Include Address as part of the User response
+  address?: UserAddress;
 }

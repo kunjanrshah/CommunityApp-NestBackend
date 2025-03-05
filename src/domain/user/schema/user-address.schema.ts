@@ -1,4 +1,5 @@
 import { Int, Field, ObjectType } from '@nestjs/graphql';
+import { AddrType } from '@prisma/client';
 
 @ObjectType()
 export class UserAddress {
@@ -29,6 +30,6 @@ export class UserAddress {
   @Field({ nullable: true, defaultValue: '' })
   pincode?: string;
 
-  @Field({ nullable: true, defaultValue: false })
-  is_rented?: boolean;
+  @Field(() => AddrType, { defaultValue: AddrType.OWN }) // Include Address as part of the User
+  addr_type: AddrType;
 }

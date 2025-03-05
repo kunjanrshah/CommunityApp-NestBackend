@@ -7,27 +7,39 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export enum AddrType {
+  OWN = 'OWN',
+  RENTED = 'RENTED',
+}
+
 export enum Role {
   ADMIN = 'ADMIN',
   USER = 'USER',
 }
 
-export interface AddUserArgs {
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface UpsertUserInput {
+  user_id?: Nullable<number>;
+  address_id?: Nullable<number>;
   role: Role;
-  head_id: number;
+  head_id?: Nullable<number>;
   member_code?: Nullable<string>;
   email?: Nullable<string>;
   mobile?: Nullable<string>;
-  password: string;
-  relationship_id?: Nullable<number>;
-  sub_community_id: number;
-  local_community_id: number;
-  first_name: string;
-  last_name_id: number;
+  password?: Nullable<string>;
+  relation_id?: Nullable<number>;
+  sub_community_id?: Nullable<number>;
+  local_community_id?: Nullable<number>;
+  first_name?: Nullable<string>;
+  last_name_id?: Nullable<number>;
   father_name?: Nullable<string>;
-  mother_name: string;
+  mother_name?: Nullable<string>;
   status: boolean;
-  gender: boolean;
+  gender?: Nullable<boolean>;
   phone?: Nullable<string>;
   profile_pic: string;
   region?: Nullable<string>;
@@ -39,40 +51,14 @@ export interface AddUserArgs {
   login_status?: Nullable<boolean>;
   last_login?: Nullable<DateTime>;
   profile_percent: number;
-}
-
-export interface UpdateUserArgs {
-  role?: Nullable<Role>;
-  head_id?: Nullable<number>;
-  member_code?: Nullable<string>;
-  email?: Nullable<string>;
-  mobile?: Nullable<string>;
-  password?: Nullable<string>;
-  relationship_id?: Nullable<number>;
-  sub_community_id?: Nullable<number>;
-  local_community_id?: Nullable<number>;
-  first_name?: Nullable<string>;
-  last_name_id?: Nullable<number>;
-  father_name?: Nullable<string>;
-  mother_name?: Nullable<string>;
-  status?: Nullable<boolean>;
-  gender?: Nullable<boolean>;
-  phone?: Nullable<string>;
-  profile_pic?: Nullable<string>;
-  region?: Nullable<string>;
-  is_expired?: Nullable<boolean>;
-  expire_date?: Nullable<DateTime>;
-  education_id?: Nullable<number>;
-  occupation_id?: Nullable<number>;
-  deleted?: Nullable<boolean>;
-  login_status?: Nullable<boolean>;
-  last_login?: Nullable<DateTime>;
-  profile_percent?: Nullable<number>;
-}
-
-export interface ChangePasswordInput {
-  currentPassword: string;
-  newPassword: string;
+  city_id?: Nullable<number>;
+  state_id?: Nullable<number>;
+  addr_type: AddrType;
+  address?: Nullable<string>;
+  area?: Nullable<string>;
+  pincode?: Nullable<string>;
+  local_address?: Nullable<string>;
+  mosaad_id?: Nullable<number>;
 }
 
 export interface RegisterInput {
@@ -110,6 +96,19 @@ export interface AuthResponse {
   message: string;
 }
 
+export interface UserAddress {
+  id: number;
+  user_id: number;
+  address: string;
+  city_id: number;
+  state_id: number;
+  local_address?: Nullable<string>;
+  mosaad_id?: Nullable<number>;
+  area?: Nullable<string>;
+  pincode?: Nullable<string>;
+  addr_type: AddrType;
+}
+
 export interface UserSchema {
   id: number;
   role: Role;
@@ -118,7 +117,7 @@ export interface UserSchema {
   email?: Nullable<string>;
   mobile?: Nullable<string>;
   password: string;
-  relationship_id?: Nullable<number>;
+  relation_id?: Nullable<number>;
   sub_community_id?: Nullable<number>;
   local_community_id?: Nullable<number>;
   first_name: string;
@@ -138,6 +137,7 @@ export interface UserSchema {
   login_status?: Nullable<boolean>;
   last_login?: Nullable<DateTime>;
   profile_percent: number;
+  address?: Nullable<UserAddress>;
 }
 
 export interface ChangePasswordResponse {
@@ -145,21 +145,14 @@ export interface ChangePasswordResponse {
 }
 
 export interface IQuery {
-  getProtectedData(): string | Promise<string>;
-  findUserById(userId: number): UserSchema | Promise<UserSchema>;
-  findUserByMobile(mobile: string): UserSchema | Promise<UserSchema>;
-  getAllUsers(): UserSchema[] | Promise<UserSchema[]>;
-  securedResourceforUser(): string | Promise<string>;
   securedResourceforAdmin(): string | Promise<string>;
 }
 
 export interface IMutation {
-  deleteUserById(userId: number): string | Promise<string>;
-  addUser(addUserArgs: AddUserArgs): UserSchema | Promise<UserSchema>;
-  updateUser(userId: number, updateUserArgs: UpdateUserArgs): UserSchema | Promise<UserSchema>;
   changePassword(
     ChangePasswordInput: ChangePasswordInput,
   ): ChangePasswordResponse | Promise<ChangePasswordResponse>;
+  upsertUser(upsertUserInput: UpsertUserInput): UserSchema | Promise<UserSchema>;
   register(RegisterInput: RegisterInput): AuthResponse | Promise<AuthResponse>;
   login(LoginInput: LoginInput): AuthResponse | Promise<AuthResponse>;
   refreshToken(token: string): AuthResponse | Promise<AuthResponse>;

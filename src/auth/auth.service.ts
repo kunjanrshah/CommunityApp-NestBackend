@@ -8,7 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
-import { RegisterInput } from 'src/domain/user/args/user.register.args';
+import { RegisterInput } from 'src/auth/dto/register.input';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthService {

@@ -1,7 +1,7 @@
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { LoginInput } from 'src/domain/user/args/user.login.args';
-import { AuthResponse, RegisterInput } from 'src/domain/user/args/user.register.args';
+import { LoginInput } from 'src/auth/dto/login.input';
+import { AuthResponse, RegisterInput } from 'src/auth/dto/register.input';
 import { Public } from 'src/public.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EmailService } from './email.service';
