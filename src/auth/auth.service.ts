@@ -102,4 +102,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token', err.message);
     }
   }
+  async checkVersionExists(version: number): Promise<boolean> {
+    const versionExists = await this.prisma.appVersion.findFirst({ where: { version } });
+    return !!versionExists;
+  }
 }

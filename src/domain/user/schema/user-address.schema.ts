@@ -2,7 +2,7 @@ import { Int, Field, ObjectType } from '@nestjs/graphql';
 import { AddrType } from '@prisma/client';
 
 @ObjectType()
-export class UserAddress {
+export class UserAddressModel {
   @Field(() => Int)
   id: number;
 

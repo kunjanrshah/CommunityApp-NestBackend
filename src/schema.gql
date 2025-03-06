@@ -8,7 +8,7 @@ type AuthResponse {
   message: String!
 }
 
-type UserAddress {
+type UserAddressModel {
   id: Int!
   user_id: Int!
   address: String!
@@ -27,7 +27,7 @@ enum AddrType {
   RENTED
 }
 
-type UserSchema {
+type UserModel {
   id: Int!
   role: Role!
   head_id: Int!
@@ -55,7 +55,7 @@ type UserSchema {
   login_status: Boolean
   last_login: DateTime
   profile_percent: Float!
-  address: UserAddress
+  address: UserAddressModel
 }
 
 enum Role {
@@ -74,11 +74,13 @@ type ChangePasswordResponse {
 
 type Query {
   securedResourceforAdmin: String!
+  isAppVersionExists(version: Float!): Boolean!
 }
 
 type Mutation {
   changePassword(ChangePasswordInput: ChangePasswordInput!): ChangePasswordResponse!
-  upsertUser(upsertUserInput: UpsertUserInput!): UserSchema!
+  upsertUser(upsertUserInput: UpsertUserInput!): UserModel!
+  updateLastLogin(user_id: Int!): Boolean!
   register(RegisterInput: RegisterInput!): AuthResponse!
   login(LoginInput: LoginInput!): AuthResponse!
   refreshToken(token: String!): AuthResponse!

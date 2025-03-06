@@ -21,6 +21,11 @@ enum AddrType {
   RENTED
 }
 
+model AppVersion {
+  id      Int @id
+  version Int
+}
+
 model User {
   id                 Int          @id @default(autoincrement())
   role               Role         @default(USER)

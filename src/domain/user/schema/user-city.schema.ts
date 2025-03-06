@@ -1,7 +1,7 @@
 import { Int, Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class CitySchema {
+export class CityModel {
   @Field(() => Int)
   id: number;
 

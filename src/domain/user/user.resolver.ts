@@ -1,18 +1,18 @@
-import { Resolver, Query, Args, Mutation, Context } from '@nestjs/graphql';
-import { UserSchema } from './schema/user.schema';
+import { Resolver, Query, Args, Mutation, Context, Int } from '@nestjs/graphql';
+import { UserModel } from './schema/user.schema';
 import { UserService } from './user.service';
 import { UpsertUserInput } from './args/user.upsert.args';
 import { ChangePasswordInput, ChangePasswordResponse } from './args/user.change-password.args';
 import { Roles } from 'src/roles.decorator';
 import { Role, User } from '@prisma/client';
 
-@Resolver(() => UserSchema)
+@Resolver(() => UserModel)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => String)
   @Roles(Role.ADMIN)
-  securedResourceforAdmin(@Context('user') user: UserSchema) {
+  securedResourceforAdmin(@Context('user') user: UserModel) {
     return 'This is Secured Resource' + JSON.stringify(user);
   }
 
@@ -29,9 +29,14 @@ export class UserResolver {
     );
   }
 
-  @Mutation(() => UserSchema)
+  @Mutation(() => UserModel)
   async upsertUser(@Args('upsertUserInput') upsertUserInput: UpsertUserInput): Promise<User> {
     return this.userService.upsertUser(upsertUserInput);
+  }
+
+  @Mutation(() => Boolean)
+  async updateLastLogin(@Args('user_id', { type: () => Int }) user_id: number): Promise<boolean> {
+    return this.userService.updateLastLogin(user_id);
   }
 
   // @Query(() => String)

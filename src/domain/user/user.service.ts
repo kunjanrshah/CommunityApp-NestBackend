@@ -2,7 +2,6 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { UpsertUserInput } from './args/user.upsert.args';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
-import { Prisma } from '@prisma/client';
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
@@ -34,17 +33,23 @@ export class UserService {
   async upsertUser(data: UpsertUserInput) {
     try {
       return await this.prisma.$transaction(async (prisma) => {
-        // Hash password only if provided
         const hashedPassword = data.password ? await bcrypt.hash(data.password, 10) : undefined;
 
-        // Remove undefined values dynamically from update data
-        const userUpdateData: Partial<Prisma.UserUncheckedUpdateInput> = Object.fromEntries(
+        // Function to format date as 'Y-m-d H:i:s'
+        const formatDate = (date: Date) => date.toISOString().slice(0, 19).replace('T', ' '); // Converts to 'YYYY-MM-DD HH:MM:SS'
+
+        // Remove undefined values dynamically
+        const userUpdateData = Object.fromEntries(
           Object.entries({
             role: data.role,
             email: data.email,
             mobile: data.mobile,
             password: hashedPassword,
             head_id: data.head_id,
+            member_code: data.member_code,
+            relation_id: data.relation_id,
+            sub_community_id: data.sub_community_id,
+            local_community_id: data.local_community_id,
             first_name: data.first_name,
             last_name_id: data.last_name_id,
             father_name: data.father_name,
@@ -52,18 +57,29 @@ export class UserService {
             status: data.status,
             gender: data.gender,
             phone: data.phone,
+            profile_pic: data.profile_pic,
+            region: data.region,
+            is_expired: data.is_expired,
+            expire_date: data.expire_date,
             education_id: data.education_id,
             occupation_id: data.occupation_id,
-          }).filter(([, v]) => v !== undefined), // Remove undefined values
+            deleted: data.deleted,
+            login_status: data.login_status,
+            last_login: formatDate(new Date()),
+            profile_percent: data.profile_percent,
+          }).filter(([, v]) => v !== undefined),
         );
 
-        // Default values for required fields in create
-        const userCreateData: Prisma.UserUncheckedCreateInput = {
+        const userCreateData = {
           role: data.role ?? 'USER',
           email: data.email ?? null,
           mobile: data.mobile ?? null,
           password: hashedPassword ?? 'defaultPassword',
           head_id: data.head_id ?? 0,
+          member_code: data.member_code ?? null,
+          relation_id: data.relation_id ?? null,
+          sub_community_id: data.sub_community_id ?? 0,
+          local_community_id: data.local_community_id ?? 0,
           first_name: data.first_name ?? 'Unknown',
           last_name_id: data.last_name_id ?? 0,
           father_name: data.father_name ?? null,
@@ -71,37 +87,42 @@ export class UserService {
           status: data.status ?? true,
           gender: data.gender ?? false,
           phone: data.phone ?? null,
-          local_community_id: data.local_community_id ?? 0,
-          sub_community_id: data.sub_community_id ?? null,
+          profile_pic: data.profile_pic ?? 'noimage.png',
+          region: data.region ?? null,
+          is_expired: data.is_expired ?? false,
+          expire_date: data.expire_date ?? null,
           education_id: data.education_id ?? null,
           occupation_id: data.occupation_id ?? null,
+          deleted: data.deleted ?? false,
+          login_status: data.login_status ?? null,
+          last_login: formatDate(new Date()),
+          profile_percent: data.profile_percent ?? 5,
         };
 
         // Upsert User
         const user = await prisma.user.upsert({
-          where: { id: data.user_id ?? -1 },
+          where: { id: data.user_id ?? -1 }, // Ensures update happens only if user exists
           update: userUpdateData,
           create: userCreateData,
         });
 
-        // Upsert Address only if any address fields are provided
+        // Upsert Address only if address fields are provided
         if (data.city_id || data.state_id || data.address) {
-          const addressUpdateData: Partial<Prisma.UserAddressUncheckedUpdateInput> =
-            Object.fromEntries(
-              Object.entries({
-                city_id: data.city_id,
-                state_id: data.state_id,
-                addr_type: data.addr_type,
-                address: data.address,
-                area: data.area,
-                pincode: data.pincode,
-                local_address: data.local_address,
-                mosaad_id: data.mosaad_id,
-              }).filter(([, v]) => v !== undefined), // Remove undefined values
-            );
+          const addressUpdateData = Object.fromEntries(
+            Object.entries({
+              city_id: data.city_id,
+              state_id: data.state_id,
+              addr_type: data.addr_type,
+              address: data.address,
+              area: data.area,
+              pincode: data.pincode,
+              local_address: data.local_address,
+              mosaad_id: data.mosaad_id,
+            }).filter(([, v]) => v !== undefined),
+          );
 
           await prisma.userAddress.upsert({
-            where: { id: data.address_id ?? -1 },
+            where: { user_id: user.id }, // Ensure unique user_id constraint
             update: addressUpdateData,
             create: {
               city_id: data.city_id!,
@@ -112,7 +133,7 @@ export class UserService {
               pincode: data.pincode ?? null,
               local_address: data.local_address ?? null,
               mosaad_id: data.mosaad_id ?? null,
-              user_id: user.id,
+              user_id: user.id, // Ensures correct relation
             },
           });
         }
@@ -128,12 +149,26 @@ export class UserService {
     }
   }
 
-  //   async updateUser(id: number, updateUserArgs: UpdateUserArgs) {
-  //   return await this.prisma.user.update({
-  //     where: { id },
-  //     data: { ...updateUserArgs },
-  //   });
-  // }
+  async updateLastLogin(user_id: number): Promise<boolean> {
+    try {
+      // Get the current UTC time
+      const now = new Date();
+
+      // Convert UTC to IST (UTC+5:30)
+      const istOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+      const istDate = new Date(now.getTime() + istOffset);
+
+      // Update last_login field for the user
+      const updatedUser = await this.prisma.user.update({
+        where: { id: user_id },
+        data: { last_login: istDate },
+      });
+
+      return !!updatedUser;
+    } catch (error) {
+      throw new BadRequestException('Error updating last login: ' + error.message);
+    }
+  }
 
   // async deleteUser(id: number): Promise<string> {
   //   try {

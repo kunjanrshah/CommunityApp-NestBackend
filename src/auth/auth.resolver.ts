@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { LoginInput } from 'src/auth/dto/login.input';
 import { AuthResponse, RegisterInput } from 'src/auth/dto/register.input';
@@ -92,5 +92,11 @@ export class AuthResolver {
     });
 
     return 'Password successfully reset!';
+  }
+
+  @Public()
+  @Query(() => Boolean)
+  async isAppVersionExists(@Args('version', { type: () => Number }) version: number) {
+    return this.authService.checkVersionExists(version);
   }
 }

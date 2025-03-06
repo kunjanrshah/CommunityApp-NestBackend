@@ -96,7 +96,7 @@ export interface AuthResponse {
   message: string;
 }
 
-export interface UserAddress {
+export interface UserAddressModel {
   id: number;
   user_id: number;
   address: string;
@@ -109,7 +109,7 @@ export interface UserAddress {
   addr_type: AddrType;
 }
 
-export interface UserSchema {
+export interface UserModel {
   id: number;
   role: Role;
   head_id: number;
@@ -137,7 +137,7 @@ export interface UserSchema {
   login_status?: Nullable<boolean>;
   last_login?: Nullable<DateTime>;
   profile_percent: number;
-  address?: Nullable<UserAddress>;
+  address?: Nullable<UserAddressModel>;
 }
 
 export interface ChangePasswordResponse {
@@ -146,13 +146,15 @@ export interface ChangePasswordResponse {
 
 export interface IQuery {
   securedResourceforAdmin(): string | Promise<string>;
+  isAppVersionExists(version: number): boolean | Promise<boolean>;
 }
 
 export interface IMutation {
   changePassword(
     ChangePasswordInput: ChangePasswordInput,
   ): ChangePasswordResponse | Promise<ChangePasswordResponse>;
-  upsertUser(upsertUserInput: UpsertUserInput): UserSchema | Promise<UserSchema>;
+  upsertUser(upsertUserInput: UpsertUserInput): UserModel | Promise<UserModel>;
+  updateLastLogin(user_id: number): boolean | Promise<boolean>;
   register(RegisterInput: RegisterInput): AuthResponse | Promise<AuthResponse>;
   login(LoginInput: LoginInput): AuthResponse | Promise<AuthResponse>;
   refreshToken(token: string): AuthResponse | Promise<AuthResponse>;
