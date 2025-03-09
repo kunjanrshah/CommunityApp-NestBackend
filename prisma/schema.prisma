@@ -27,12 +27,12 @@ model AppVersion {
 }
 
 model User {
-  id                 Int          @id @default(autoincrement())
-  role               Role         @default(USER)
-  head_id            Int          @default(0)
-  member_code        String?      @unique // Optional field
-  email              String?      @unique // Optional field
-  mobile             String?      @unique // Optional field
+  id                 Int                 @id @default(autoincrement())
+  role               Role                @default(USER)
+  head_id            Int                 @default(0)
+  member_code        String?             @unique // Optional field
+  email              String?             @unique // Optional field
+  mobile             String?             @unique // Optional field
   password           String
   relation_id        Int? // Optional field
   sub_community_id   Int?
@@ -41,22 +41,23 @@ model User {
   last_name_id       Int
   father_name        String? // Optional field
   mother_name        String? // Optional field
-  status             Boolean      @default(true)
+  status             Boolean             @default(true)
   gender             Boolean
   phone              String? // Optional field
-  profile_pic        String       @default("noimage.png")
+  profile_pic        String              @default("noimage.png")
   region             String? // Optional field
-  is_expired         Boolean      @default(false)
+  is_expired         Boolean             @default(false)
   expire_date        DateTime? // Optional field
   education_id       Int? // Optional field
   occupation_id      Int? // Optional field
-  deleted            Boolean      @default(false)
+  deleted            Boolean             @default(false)
   login_status       Boolean? // Optional field
   last_login         DateTime? // Optional field
-  profile_percent    Float        @default(5)
+  profile_percent    Float               @default(5)
   resetToken         String? // Token for password reset
   resetTokenExpiry   DateTime? // Expiry for reset token
   address            UserAddress? // One-to-one relation (Optional)
+  UserPersonalDetail UserPersonalDetail?
 }
 
 model UserAddress {
@@ -73,12 +74,124 @@ model UserAddress {
   user          User?    @relation(fields: [user_id], references: [id])
 }
 
-model City {
-  id   Int    @id @default(autoincrement())
-  name String
+model UserPersonalDetail {
+  id                  Int              @id @default(autoincrement())
+  user_id             Int              @unique
+  user                User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  is_donor            Boolean          @default(false)
+  matrimony           Boolean          @default(false)
+  birth_date          DateTime?
+  native_place_id     Int?
+  native_place        NativePlace?     @relation(fields: [native_place_id], references: [id], onDelete: SetNull)
+  blood_group         String?
+  current_activity_id Int?
+  current_activity    CurrentActivity? @relation(fields: [current_activity_id], references: [id], onDelete: SetNull)
+  marital_status      String?          @db.VarChar(20)
+  marriage_date       DateTime?
+  gotra_id            Int?
+  gotra               Gotra?           @relation(fields: [gotra_id], references: [id], onDelete: SetNull)
 }
 
 model State {
-  id   Int    @id @default(autoincrement())
-  name String
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+  cities  City[] // ✅ One-to-Many relationship with City
+}
+
+model City {
+  id       Int      @id @default(autoincrement())
+  name     String
+  deleted  Boolean
+  updated  DateTime
+  state_id Int // ✅ Foreign Key
+  state    State    @relation(fields: [state_id], references: [id]) // ✅ Relationship Definition
+}
+
+model BusinessCategory {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+}
+
+model Occupation {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+}
+
+model Committee {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+}
+
+model Designation {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+}
+
+model CurrentActivity {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  deleted            Boolean
+  updated            DateTime
+  UserPersonalDetail UserPersonalDetail[]
+}
+
+model Education {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+}
+
+model SubCommunity {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+}
+
+model LocalCommunity {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+}
+
+model NativePlace {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  deleted            Boolean
+  updated            DateTime
+  UserPersonalDetail UserPersonalDetail[]
+}
+
+model Relations {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
+}
+
+model Gotra {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  deleted            Boolean
+  updated            DateTime
+  UserPersonalDetail UserPersonalDetail[]
+}
+
+model SubCast {
+  id      Int      @id @default(autoincrement())
+  name    String
+  deleted Boolean
+  updated DateTime
 }

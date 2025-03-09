@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UpsertUserInput } from './args/user.upsert.args';
+import { UpsertUserInput } from './dto/user.upsert.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 @Injectable()

@@ -72,8 +72,35 @@ type ChangePasswordResponse {
   message: String!
 }
 
+type MasterDTO {
+  id: String!
+  name: String!
+}
+
+type GetMastersResponseDTO {
+  success: Boolean!
+  message: String
+  data: [MasterDTO!]!
+  deleted: [String!]!
+  last_updated: Int!
+}
+
 type Query {
   securedResourceforAdmin: String!
+  getCities(date: String): GetMastersResponseDTO!
+  getStates(date: String): GetMastersResponseDTO!
+  getBusinessCategories(date: String): GetMastersResponseDTO!
+  getOccupations(date: String): GetMastersResponseDTO!
+  getCommittees(date: String): GetMastersResponseDTO!
+  getDesignations(date: String): GetMastersResponseDTO!
+  getCurrentActivities(date: String): GetMastersResponseDTO!
+  getEducations(date: String): GetMastersResponseDTO!
+  getSubCommunities(date: String): GetMastersResponseDTO!
+  getLocalCommunities(date: String): GetMastersResponseDTO!
+  getNativePlaces(date: String): GetMastersResponseDTO!
+  getRelations(date: String): GetMastersResponseDTO!
+  getGotras(date: String): GetMastersResponseDTO!
+  getSubCasts(date: String): GetMastersResponseDTO!
   isAppVersionExists(version: Float!): Boolean!
 }
 

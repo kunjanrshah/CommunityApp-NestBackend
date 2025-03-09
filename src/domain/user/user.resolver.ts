@@ -1,8 +1,8 @@
 import { Resolver, Query, Args, Mutation, Context, Int } from '@nestjs/graphql';
 import { UserModel } from './schema/user.schema';
 import { UserService } from './user.service';
-import { UpsertUserInput } from './args/user.upsert.args';
-import { ChangePasswordInput, ChangePasswordResponse } from './args/user.change-password.args';
+import { UpsertUserInput } from './dto/user.upsert.dto';
+import { ChangePasswordInput, ChangePasswordResponse } from './dto/user.change-password.dto';
 import { Roles } from 'src/roles.decorator';
 import { Role, User } from '@prisma/client';
 

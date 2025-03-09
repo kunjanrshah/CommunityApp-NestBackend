@@ -3,9 +3,10 @@ import { UserModule } from './user/user.module';
 import { APP_GUARD } from '@nestjs/core';
 import { GqlAuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { MastersModule } from './masters/masters.module';
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, MastersModule],
   controllers: [],
   providers: [
     {
