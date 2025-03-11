@@ -1,7 +1,7 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { MastersCountService } from './masters.service';
 import { MastersModel } from './schema/masters.schema';
-import { GetMastersResponseDTO } from './dto/get-masters.dto';
+import { GetMastersResponseDTO } from './dto/model/get-masters.dto';
 
 // Masters ADD/UPDATE RESOLVER PENDING SHOULD BE WITH CURRENT DATE
 @Resolver(() => MastersModel)
@@ -25,12 +25,12 @@ export class MastersResolver {
     return this.mastersService.getRecords('businessCategory', date);
   }
   // TODO: NO NEED
-  @Query(() => GetMastersResponseDTO)
-  async getOccupations(
-    @Args('date', { nullable: true }) date?: string,
-  ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('occupation', date);
-  }
+  // @Query(() => GetMastersResponseDTO)
+  // async getOccupations(
+  //   @Args('date', { nullable: true }) date?: string,
+  // ): Promise<GetMastersResponseDTO> {
+  //   return this.mastersService.getRecords('occupation', date);
+  // }
 
   @Query(() => GetMastersResponseDTO)
   async getCommittees(
@@ -40,20 +40,20 @@ export class MastersResolver {
   }
 
   // TODO: NO NEED
-  @Query(() => GetMastersResponseDTO)
-  async getDesignations(
-    @Args('date', { nullable: true }) date?: string,
-  ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('designation', date);
-  }
+  // @Query(() => GetMastersResponseDTO)
+  // async getDesignations(
+  //   @Args('date', { nullable: true }) date?: string,
+  // ): Promise<GetMastersResponseDTO> {
+  //   return this.mastersService.getRecords('designation', date);
+  // }
 
   // TODO: NO NEED
-  @Query(() => GetMastersResponseDTO)
-  async getCurrentActivities(
-    @Args('date', { nullable: true }) date?: string,
-  ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('currentActivity', date);
-  }
+  // @Query(() => GetMastersResponseDTO)
+  // async getCurrentActivities(
+  //   @Args('date', { nullable: true }) date?: string,
+  // ): Promise<GetMastersResponseDTO> {
+  //   return this.mastersService.getRecords('currentActivity', date);
+  // }
 
   @Query(() => GetMastersResponseDTO)
   async getEducations(
@@ -63,28 +63,28 @@ export class MastersResolver {
   }
 
   // TODO: NO NEED
-  @Query(() => GetMastersResponseDTO)
-  async getSubCommunities(
-    @Args('date', { nullable: true }) date?: string,
-  ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('subCommunity', date);
-  }
+  // @Query(() => GetMastersResponseDTO)
+  // async getSubCommunities(
+  //   @Args('date', { nullable: true }) date?: string,
+  // ): Promise<GetMastersResponseDTO> {
+  //   return this.mastersService.getRecords('subCommunity', date);
+  // }
 
   // TODO: NO NEED
-  @Query(() => GetMastersResponseDTO)
-  async getLocalCommunities(
-    @Args('date', { nullable: true }) date?: string,
-  ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('localCommunity', date);
-  }
+  // @Query(() => GetMastersResponseDTO)
+  // async getLocalCommunities(
+  //   @Args('date', { nullable: true }) date?: string,
+  // ): Promise<GetMastersResponseDTO> {
+  //   return this.mastersService.getRecords('localCommunity', date);
+  // }
 
   // TODO: NO NEED
-  @Query(() => GetMastersResponseDTO)
-  async getNativePlaces(
-    @Args('date', { nullable: true }) date?: string,
-  ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('nativePlace', date);
-  }
+  // @Query(() => GetMastersResponseDTO)
+  // async getNativePlaces(
+  //   @Args('date', { nullable: true }) date?: string,
+  // ): Promise<GetMastersResponseDTO> {
+  //   return this.mastersService.getRecords('nativePlace', date);
+  // }
 
   @Query(() => GetMastersResponseDTO)
   async getRelations(

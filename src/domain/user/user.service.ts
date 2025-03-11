@@ -35,8 +35,10 @@ export class UserService {
       return await this.prisma.$transaction(async (prisma) => {
         const hashedPassword = data.password ? await bcrypt.hash(data.password, 10) : undefined;
 
-        // Function to format date as 'Y-m-d H:i:s'
-        const formatDate = (date: Date) => date.toISOString().slice(0, 19).replace('T', ' '); // Converts to 'YYYY-MM-DD HH:MM:SS'
+        const formatISTDate = (date: Date) => {
+          const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+          return new Date(date.getTime() + istOffset).toISOString();
+        };
 
         // Remove undefined values dynamically
         const userUpdateData = Object.fromEntries(
@@ -65,7 +67,7 @@ export class UserService {
             occupation_id: data.occupation_id,
             deleted: data.deleted,
             login_status: data.login_status,
-            last_login: formatDate(new Date()),
+            last_login: formatISTDate(new Date()),
             profile_percent: data.profile_percent,
           }).filter(([, v]) => v !== undefined),
         );
@@ -95,18 +97,18 @@ export class UserService {
           occupation_id: data.occupation_id ?? null,
           deleted: data.deleted ?? false,
           login_status: data.login_status ?? null,
-          last_login: formatDate(new Date()),
+          last_login: formatISTDate(new Date()),
           profile_percent: data.profile_percent ?? 5,
         };
 
         // Upsert User
         const user = await prisma.user.upsert({
-          where: { id: data.user_id ?? -1 }, // Ensures update happens only if user exists
+          where: { id: data.user_id ?? -1 },
           update: userUpdateData,
           create: userCreateData,
         });
 
-        // Upsert Address only if address fields are provided
+        // Upsert Address
         if (data.city_id || data.state_id || data.address) {
           const addressUpdateData = Object.fromEntries(
             Object.entries({
@@ -122,7 +124,7 @@ export class UserService {
           );
 
           await prisma.userAddress.upsert({
-            where: { user_id: user.id }, // Ensure unique user_id constraint
+            where: { user_id: user.id },
             update: addressUpdateData,
             create: {
               city_id: data.city_id!,
@@ -133,15 +135,120 @@ export class UserService {
               pincode: data.pincode ?? null,
               local_address: data.local_address ?? null,
               mosaad_id: data.mosaad_id ?? null,
-              user_id: user.id, // Ensures correct relation
+              user_id: user.id,
             },
           });
         }
 
-        // Fetch updated user with address
+        // **Upsert User Work Details**
+        if (data.business_category_id || data.company_name) {
+          const workUpdateData = Object.fromEntries(
+            Object.entries({
+              business_category_id: data.business_category_id,
+              business_address: data.business_address,
+              business_logo: data.business_logo,
+              company_name: data.company_name,
+              website: data.website,
+              work_details: data.work_details,
+            }).filter(([, v]) => v !== undefined),
+          );
+
+          await prisma.userWorkDetails.upsert({
+            where: { user_id: user.id },
+            update: workUpdateData,
+            create: {
+              user_id: user.id,
+              business_category_id: data.business_category_id ?? null,
+              business_address: data.business_address ?? null,
+              business_logo: data.business_logo ?? null,
+              company_name: data.company_name ?? null,
+              website: data.website ?? null,
+              work_details: data.work_details ?? null,
+            },
+          });
+        }
+
+        // **Upsert User Matrimony Details**
+        if (data.hobby || data.birth_time) {
+          const matrimonyUpdateData = Object.fromEntries(
+            Object.entries({
+              birth_time: data.birth_time,
+              birth_place: data.birth_place,
+              hobby: data.hobby,
+              about_me: data.about_me,
+              weight: data.weight,
+              height: data.height,
+              is_spect: data.is_spect,
+              is_mangal: data.is_mangal,
+              is_shani: data.is_shani,
+              facebook_profile: data.facebook_profile,
+              expectation: data.expectation,
+            }).filter(([, v]) => v !== undefined),
+          );
+
+          await prisma.userMatrimony.upsert({
+            where: { user_id: user.id },
+            update: matrimonyUpdateData,
+            create: {
+              user_id: user.id,
+              birth_time: data.birth_time ?? null,
+              birth_place: data.birth_place ?? null,
+              hobby: data.hobby!,
+              about_me: data.about_me ?? null,
+              weight: data.weight ?? null,
+              height: data.height ?? null,
+              is_spect: data.is_spect ?? false,
+              is_mangal: data.is_mangal ?? false,
+              is_shani: data.is_shani ?? false,
+              facebook_profile: data.facebook_profile ?? null,
+              expectation: data.expectation ?? null,
+            },
+          });
+        }
+
+        // Upsert UserPersonalDetail
+        if (data.is_donor || data.birth_date || data.blood_group) {
+          const personalDetailUpdateData = Object.fromEntries(
+            Object.entries({
+              is_donor: data.is_donor,
+              matrimony: data.matrimony,
+              birth_date: data.birth_date,
+              native_place_id: data.native_place_id,
+              blood_group: data.blood_group,
+              current_activity_id: data.current_activity_id,
+              marital_status: data.marital_status,
+              marriage_date: data.marriage_date,
+              gotra_id: data.gotra_id,
+            }).filter(([, v]) => v !== undefined),
+          );
+
+          await prisma.userPersonalDetail.upsert({
+            where: { user_id: user.id },
+            update: personalDetailUpdateData,
+            create: {
+              user_id: user.id,
+              is_donor: data.is_donor ?? false,
+              matrimony: data.matrimony ?? false,
+              birth_date: data.birth_date ?? null,
+              native_place_id: data.native_place_id ?? null,
+              blood_group: data.blood_group ?? null,
+              current_activity_id: data.current_activity_id ?? null,
+              marital_status: data.marital_status ?? null,
+              marriage_date: data.marriage_date ?? null,
+              gotra_id: data.gotra_id ?? null,
+            },
+          });
+        }
+
+        // Fetch updated user with related data
         return prisma.user.findUnique({
           where: { id: user.id },
-          include: { address: true },
+          include: {
+            userAddress: true,
+            userPersonalDetail: true,
+            userWorkDetails: true,
+            userMatrimony: true,
+          },
         });
       });
     } catch (error) {

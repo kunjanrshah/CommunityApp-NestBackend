@@ -25,7 +25,6 @@ export interface ChangePasswordInput {
 
 export interface UpsertUserInput {
     user_id?: Nullable<number>;
-    address_id?: Nullable<number>;
     role: Role;
     head_id?: Nullable<number>;
     member_code?: Nullable<string>;
@@ -60,6 +59,32 @@ export interface UpsertUserInput {
     pincode?: Nullable<string>;
     local_address?: Nullable<string>;
     mosaad_id?: Nullable<number>;
+    is_donor: boolean;
+    matrimony: boolean;
+    birth_date?: Nullable<DateTime>;
+    native_place_id?: Nullable<number>;
+    blood_group?: Nullable<string>;
+    current_activity_id?: Nullable<number>;
+    marital_status?: Nullable<string>;
+    marriage_date?: Nullable<DateTime>;
+    gotra_id?: Nullable<number>;
+    business_category_id?: Nullable<number>;
+    business_address?: Nullable<string>;
+    business_logo?: Nullable<string>;
+    company_name?: Nullable<string>;
+    website?: Nullable<string>;
+    work_details?: Nullable<string>;
+    birth_time?: Nullable<string>;
+    birth_place?: Nullable<string>;
+    hobby?: Nullable<string>;
+    about_me?: Nullable<string>;
+    weight?: Nullable<number>;
+    height?: Nullable<number>;
+    is_spect: boolean;
+    is_mangal: boolean;
+    is_shani: boolean;
+    facebook_profile?: Nullable<string>;
+    expectation?: Nullable<string>;
 }
 
 export interface RegisterInput {
@@ -97,7 +122,7 @@ export interface AuthResponse {
     message: string;
 }
 
-export interface UserAddressModel {
+export interface UserAddressDTO {
     id: number;
     user_id: number;
     address: string;
@@ -110,7 +135,48 @@ export interface UserAddressModel {
     addr_type: AddrType;
 }
 
-export interface UserModel {
+export interface UserMatrimonyDTO {
+    id?: Nullable<number>;
+    user_id: number;
+    birth_time?: Nullable<string>;
+    birth_place?: Nullable<string>;
+    hobby: string;
+    about_me?: Nullable<string>;
+    weight?: Nullable<number>;
+    height?: Nullable<number>;
+    is_spect: boolean;
+    is_mangal: boolean;
+    is_shani: boolean;
+    facebook_profile?: Nullable<string>;
+    expectation?: Nullable<string>;
+}
+
+export interface UserPersonalDetailsDTO {
+    id: number;
+    user_id: number;
+    is_donor: boolean;
+    matrimony: boolean;
+    birth_date?: Nullable<DateTime>;
+    native_place_id?: Nullable<number>;
+    blood_group?: Nullable<string>;
+    current_activity_id?: Nullable<number>;
+    marital_status?: Nullable<string>;
+    marriage_date?: Nullable<DateTime>;
+    gotra_id?: Nullable<number>;
+}
+
+export interface UserWorkDetailsDTO {
+    id: number;
+    user_id: number;
+    business_category_id?: Nullable<number>;
+    business_address?: Nullable<string>;
+    business_logo?: Nullable<string>;
+    company_name?: Nullable<string>;
+    website?: Nullable<string>;
+    work_details?: Nullable<string>;
+}
+
+export interface UserDTO {
     id: number;
     role: Role;
     head_id: number;
@@ -138,7 +204,10 @@ export interface UserModel {
     login_status?: Nullable<boolean>;
     last_login?: Nullable<DateTime>;
     profile_percent: number;
-    address?: Nullable<UserAddressModel>;
+    userAddress?: Nullable<UserAddressDTO>;
+    userMatrimony?: Nullable<UserMatrimonyDTO>;
+    userPersonalDetails?: Nullable<UserPersonalDetailsDTO>;
+    userWorkDetails?: Nullable<UserWorkDetailsDTO>;
 }
 
 export interface ChangePasswordResponse {
@@ -163,14 +232,8 @@ export interface IQuery {
     getCities(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getStates(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getBusinessCategories(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-    getOccupations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getCommittees(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-    getDesignations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-    getCurrentActivities(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getEducations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-    getSubCommunities(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-    getLocalCommunities(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-    getNativePlaces(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getRelations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getGotras(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getSubCasts(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
@@ -179,7 +242,7 @@ export interface IQuery {
 
 export interface IMutation {
     changePassword(ChangePasswordInput: ChangePasswordInput): ChangePasswordResponse | Promise<ChangePasswordResponse>;
-    upsertUser(upsertUserInput: UpsertUserInput): UserModel | Promise<UserModel>;
+    upsertUser(upsertUserInput: UpsertUserInput): UserDTO | Promise<UserDTO>;
     updateLastLogin(user_id: number): boolean | Promise<boolean>;
     register(RegisterInput: RegisterInput): AuthResponse | Promise<AuthResponse>;
     login(LoginInput: LoginInput): AuthResponse | Promise<AuthResponse>;
@@ -189,4 +252,4 @@ export interface IMutation {
 }
 
 export type DateTime = any;
-type Nullable<T> = T 
+type Nullable<T> = T | null;

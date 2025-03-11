@@ -56,8 +56,10 @@ model User {
   profile_percent    Float               @default(5)
   resetToken         String? // Token for password reset
   resetTokenExpiry   DateTime? // Expiry for reset token
-  address            UserAddress? // One-to-one relation (Optional)
-  UserPersonalDetail UserPersonalDetail?
+  userAddress        UserAddress? // One-to-one relation (Optional)
+  userPersonalDetail UserPersonalDetail?
+  userWorkDetails    UserWorkDetails?
+  userMatrimony      UserMatrimony?
 }
 
 model UserAddress {
@@ -92,6 +94,38 @@ model UserPersonalDetail {
   gotra               Gotra?           @relation(fields: [gotra_id], references: [id], onDelete: SetNull)
 }
 
+model UserWorkDetails {
+  id                   Int     @id @default(autoincrement())
+  user_id              Int     @unique
+  business_category_id Int?    @default(0)
+  business_address     String?
+  business_logo        String?
+  company_name         String?
+  website              String?
+  work_details         String?
+
+  user                User              @relation(fields: [user_id], references: [id])
+  businessSubCategory BusinessCategory? @relation(fields: [business_category_id], references: [id])
+}
+
+model UserMatrimony {
+  id               Int     @id @default(autoincrement())
+  user_id          Int     @unique
+  birth_time       String?
+  birth_place      String? @db.VarChar(100)
+  hobby            String
+  about_me         String?
+  weight           Float?
+  height           Float?
+  is_spect         Boolean @default(false)
+  is_mangal        Boolean @default(false)
+  is_shani         Boolean @default(false)
+  facebook_profile String? @db.VarChar(255)
+  expectation      String? @db.VarChar(255)
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
 model State {
   id      Int      @id @default(autoincrement())
   name    String
@@ -110,10 +144,11 @@ model City {
 }
 
 model BusinessCategory {
-  id      Int      @id @default(autoincrement())
-  name    String
-  deleted Boolean
-  updated DateTime
+  id              Int               @id @default(autoincrement())
+  name            String
+  deleted         Boolean
+  updated         DateTime
+  UserWorkDetails UserWorkDetails[]
 }
 
 model Occupation {

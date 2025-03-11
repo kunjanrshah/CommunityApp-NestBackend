@@ -14,10 +14,10 @@ export class UpsertUserInput {
   @IsInt()
   user_id?: number;
 
-  @Field(() => Int, { nullable: true }) // If provided, update the user
-  @IsOptional()
-  @IsInt()
-  address_id?: number;
+  // @Field(() => Int, { nullable: true }) // If provided, update the user
+  // @IsOptional()
+  // @IsInt()
+  // address_id?: number;
 
   @Field(() => Role, { defaultValue: Role.USER })
   @IsOptional()
@@ -138,7 +138,7 @@ export class UpsertUserInput {
   @Field(() => Int, { defaultValue: 5 })
   profile_percent: number;
 
-  // adress table
+  // ** User Adress Details **
   @Field(() => Int, { nullable: true })
   @IsOptional()
   city_id: number;
@@ -173,4 +173,111 @@ export class UpsertUserInput {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   mosaad_id?: number;
+
+  // **User Personal Details**
+  @Field({ defaultValue: false })
+  @IsOptional()
+  is_donor?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  matrimony?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  birth_date?: Date;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  native_place_id?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  blood_group?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  current_activity_id?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  marital_status?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  marriage_date?: Date;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  gotra_id?: number;
+
+  // **User Work Details**
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  business_category_id?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  business_address?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  business_logo?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  company_name?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  website?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  work_details?: string;
+
+  // **User Matrimony Details**
+  @Field({ nullable: true })
+  @IsOptional()
+  birth_time?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  birth_place?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  hobby?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  about_me?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  weight?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  height?: number;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  is_spect?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  is_mangal?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  is_shani?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  facebook_profile?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  expectation?: string;
 }

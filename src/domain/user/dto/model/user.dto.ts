@@ -1,13 +1,16 @@
 import { Int, Field, ObjectType, Float, registerEnumType } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
-import { UserAddressModel } from './user-address.schema';
+import { UserAddressDTO } from './user-address.dto';
+import { UserMatrimonyDTO } from './user-matrimony.dto';
+import { UserPersonalDetailsDTO } from './user-personal-details.dto';
+import { UserWorkDetailsDTO } from './user-work-details.dto';
 
 registerEnumType(Role, {
   name: 'Role', // GraphQL name
 });
 
 @ObjectType()
-export class UserModel {
+export class UserDTO {
   @Field(() => Int)
   id: number;
 
@@ -89,6 +92,15 @@ export class UserModel {
   @Field(() => Float, { defaultValue: 5 })
   profile_percent: number;
 
-  @Field(() => UserAddressModel, { nullable: true }) // Include Address as part of the User response
-  address?: UserAddressModel;
+  @Field(() => UserAddressDTO, { nullable: true }) // Include Address as part of the User response
+  userAddress?: UserAddressDTO;
+
+  @Field(() => UserMatrimonyDTO, { nullable: true }) // Include Address as part of the User response
+  userMatrimony?: UserMatrimonyDTO;
+
+  @Field(() => UserPersonalDetailsDTO, { nullable: true }) // Include Address as part of the User response
+  userPersonalDetails?: UserPersonalDetailsDTO;
+
+  @Field(() => UserWorkDetailsDTO, { nullable: true }) // Include Address as part of the User response
+  userWorkDetails?: UserWorkDetailsDTO;
 }

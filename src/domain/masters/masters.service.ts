@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CountListDTO, MastersCountResponseDTO, UserCountsDTO } from './dto/masters-count.dto';
-import { GetMastersResponseDTO } from './dto/get-masters.dto';
+import {
+  CountListDTO,
+  MastersCountResponseDTO,
+  UserCountsDTO,
+} from './dto/model/masters-count.dto';
+import { GetMastersResponseDTO } from './dto/model/get-masters.dto';
 
 @Injectable()
 export class MastersCountService {
