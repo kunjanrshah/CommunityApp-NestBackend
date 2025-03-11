@@ -39,6 +39,21 @@ export class UserResolver {
     return this.userService.updateLastLogin(user_id);
   }
 
+  @Query(() => [UserDTO])
+  async getFamilyMembers(@Args('head_id', { type: () => Number }) head_id: number) {
+    return this.userService.getFamilyMembers(head_id);
+  }
+
+  @Query(() => [UserDTO], { name: 'usersByDateRange' })
+  async getUsersByDateRange(
+    @Args('fromDate') fromDate: string,
+    @Args('toDate') toDate: string,
+    @Args('page') page: number,
+    @Args('limit') limit: number,
+  ) {
+    return this.userService.getUsersByDateRange(fromDate, toDate, page, limit);
+  }
+
   // @Query(() => String)
   // getProtectedData(@Context() context) {
   //   return `Hello ${context.req.user.email}, this is protected data!`;

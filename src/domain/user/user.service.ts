@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { UpsertUserInput } from './dto/user.upsert.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
+
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
@@ -153,7 +154,7 @@ export class UserService {
             }).filter(([, v]) => v !== undefined),
           );
 
-          await prisma.userWorkDetails.upsert({
+          await prisma.userWorkDetail.upsert({
             where: { user_id: user.id },
             update: workUpdateData,
             create: {
@@ -246,7 +247,7 @@ export class UserService {
           include: {
             userAddress: true,
             userPersonalDetail: true,
-            userWorkDetails: true,
+            userWorkDetail: true,
             userMatrimony: true,
           },
         });
@@ -275,6 +276,58 @@ export class UserService {
     } catch (error) {
       throw new BadRequestException('Error updating last login: ' + error.message);
     }
+  }
+
+  async getFamilyMembers(head_id: number) {
+    return this.prisma.user.findMany({
+      where: { head_id },
+      include: {
+        userAddress: true,
+        userMatrimony: true,
+        userPersonalDetail: true,
+        userWorkDetail: true,
+      },
+    });
+  }
+
+  async getUsersByDateRange(fromDate: string, toDate: string, page: number, limit: number) {
+    const skip = (page - 1) * limit; // Pagination logic
+
+    return await this.prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            userPersonalDetail: {
+              birth_date: {
+                gte: new Date(fromDate + 'T00:00:00.000+05:30'), // Convert to IST timezone
+                lte: new Date(toDate + 'T23:59:59.999+05:30'),
+              },
+            },
+          },
+          {
+            userPersonalDetail: {
+              marriage_date: {
+                gte: new Date(fromDate + 'T00:00:00.000+05:30'),
+                lte: new Date(toDate + 'T23:59:59.999+05:30'),
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        userAddress: true,
+        userPersonalDetail: true,
+        userWorkDetail: true,
+        userMatrimony: true,
+      },
+      take: limit, // Limit results
+      skip: skip, // Skip based on page number
+      orderBy: {
+        userPersonalDetail: {
+          birth_date: 'asc', // Order by birth_date
+        },
+      },
+    });
   }
 
   // async deleteUser(id: number): Promise<string> {

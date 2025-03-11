@@ -1,4 +1,3 @@
-
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -151,7 +150,7 @@ export interface UserMatrimonyDTO {
     expectation?: Nullable<string>;
 }
 
-export interface UserPersonalDetailsDTO {
+export interface UserPersonalDetailDTO {
     id: number;
     user_id: number;
     is_donor: boolean;
@@ -165,7 +164,7 @@ export interface UserPersonalDetailsDTO {
     gotra_id?: Nullable<number>;
 }
 
-export interface UserWorkDetailsDTO {
+export interface UserWorkDetailDTO {
     id: number;
     user_id: number;
     business_category_id?: Nullable<number>;
@@ -206,8 +205,8 @@ export interface UserDTO {
     profile_percent: number;
     userAddress?: Nullable<UserAddressDTO>;
     userMatrimony?: Nullable<UserMatrimonyDTO>;
-    userPersonalDetails?: Nullable<UserPersonalDetailsDTO>;
-    userWorkDetails?: Nullable<UserWorkDetailsDTO>;
+    userPersonalDetail?: Nullable<UserPersonalDetailDTO>;
+    userWorkDetail?: Nullable<UserWorkDetailDTO>;
 }
 
 export interface ChangePasswordResponse {
@@ -229,6 +228,8 @@ export interface GetMastersResponseDTO {
 
 export interface IQuery {
     securedResourceforAdmin(): string | Promise<string>;
+    getFamilyMembers(head_id: number): UserDTO[] | Promise<UserDTO[]>;
+    usersByDateRange(fromDate: string, toDate: string, page: number, limit: number): UserDTO[] | Promise<UserDTO[]>;
     getCities(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getStates(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getBusinessCategories(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;

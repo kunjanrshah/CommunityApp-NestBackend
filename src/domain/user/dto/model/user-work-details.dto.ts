@@ -2,7 +2,7 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { IsInt, IsOptional, IsString, IsUrl } from 'class-validator';
 
 @ObjectType()
-export class UserWorkDetailsDTO {
+export class UserWorkDetailDTO {
   @Field(() => Int)
   @IsInt()
   id: number;

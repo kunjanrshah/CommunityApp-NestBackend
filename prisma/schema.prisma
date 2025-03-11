@@ -58,7 +58,7 @@ model User {
   resetTokenExpiry   DateTime? // Expiry for reset token
   userAddress        UserAddress? // One-to-one relation (Optional)
   userPersonalDetail UserPersonalDetail?
-  userWorkDetails    UserWorkDetails?
+  userWorkDetail     UserWorkDetail?
   userMatrimony      UserMatrimony?
 }
 
@@ -94,7 +94,7 @@ model UserPersonalDetail {
   gotra               Gotra?           @relation(fields: [gotra_id], references: [id], onDelete: SetNull)
 }
 
-model UserWorkDetails {
+model UserWorkDetail {
   id                   Int     @id @default(autoincrement())
   user_id              Int     @unique
   business_category_id Int?    @default(0)
@@ -144,11 +144,11 @@ model City {
 }
 
 model BusinessCategory {
-  id              Int               @id @default(autoincrement())
-  name            String
-  deleted         Boolean
-  updated         DateTime
-  UserWorkDetails UserWorkDetails[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  deleted        Boolean
+  updated        DateTime
+  UserWorkDetail UserWorkDetail[]
 }
 
 model Occupation {

@@ -43,7 +43,7 @@ type UserMatrimonyDTO {
   expectation: String
 }
 
-type UserPersonalDetailsDTO {
+type UserPersonalDetailDTO {
   id: Int!
   user_id: Int!
   is_donor: Boolean!
@@ -62,7 +62,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type UserWorkDetailsDTO {
+type UserWorkDetailDTO {
   id: Int!
   user_id: Int!
   business_category_id: Int
@@ -103,8 +103,8 @@ type UserDTO {
   profile_percent: Float!
   userAddress: UserAddressDTO
   userMatrimony: UserMatrimonyDTO
-  userPersonalDetails: UserPersonalDetailsDTO
-  userWorkDetails: UserWorkDetailsDTO
+  userPersonalDetail: UserPersonalDetailDTO
+  userWorkDetail: UserWorkDetailDTO
 }
 
 enum Role {
@@ -131,6 +131,8 @@ type GetMastersResponseDTO {
 
 type Query {
   securedResourceforAdmin: String!
+  getFamilyMembers(head_id: Float!): [UserDTO!]!
+  usersByDateRange(fromDate: String!, toDate: String!, page: Float!, limit: Float!): [UserDTO!]!
   getCities(date: String): GetMastersResponseDTO!
   getStates(date: String): GetMastersResponseDTO!
   getBusinessCategories(date: String): GetMastersResponseDTO!
