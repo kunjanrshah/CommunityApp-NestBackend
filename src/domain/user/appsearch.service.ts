@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -8,7 +9,7 @@ export class AppSearchService {
   async smartSearch(start: number, length: number, filterBy?: string) {
     if (!filterBy) return { totalRecords: 0, members: [] };
 
-    const whereCondition = {
+    const whereCondition: Prisma.UserWhereInput = {
       OR: [
         { first_name: { contains: filterBy, mode: 'insensitive' } },
         { member_code: { contains: filterBy, mode: 'insensitive' } },
@@ -24,44 +25,44 @@ export class AppSearchService {
         { userAddress: { address: { contains: filterBy, mode: 'insensitive' } } },
         { userAddress: { local_address: { contains: filterBy, mode: 'insensitive' } } },
 
+        { userAddress: { states: { name: { contains: filterBy, mode: 'insensitive' } } } },
+        { userAddress: { city: { name: { contains: filterBy, mode: 'insensitive' } } } },
+
         // Search in related UserPersonalDetail model
         { userPersonalDetail: { blood_group: { contains: filterBy, mode: 'insensitive' } } },
+        {
+          userPersonalDetail: {
+            native_place: { name: { contains: filterBy, mode: 'insensitive' } },
+          },
+        },
+        { userPersonalDetail: { gotra: { name: { contains: filterBy, mode: 'insensitive' } } } },
 
         // Search in related UserWorkDetail model
         { userWorkDetail: { company_name: { contains: filterBy, mode: 'insensitive' } } },
         { userWorkDetail: { work_details: { contains: filterBy, mode: 'insensitive' } } },
+        {
+          userWorkDetail: {
+            businessCategory: { name: { contains: filterBy, mode: 'insensitive' } },
+          },
+        },
+        { userWorkDetail: { committee: { name: { contains: filterBy, mode: 'insensitive' } } } },
+        { userWorkDetail: { designation: { name: { contains: filterBy, mode: 'insensitive' } } } },
 
         // Search in related UserMatrimony model
         { userMatrimony: { hobby: { contains: filterBy, mode: 'insensitive' } } },
         { userMatrimony: { about_me: { contains: filterBy, mode: 'insensitive' } } },
 
-        { States: { name: { contains: filterBy, mode: 'insensitive' } } },
+        { occupation: { name: { contains: filterBy, mode: 'insensitive' } } },
 
-        { City: { name: { contains: filterBy, mode: 'insensitive' } } },
+        { education: { name: { contains: filterBy, mode: 'insensitive' } } },
 
-        { BusinessCategory: { name: { contains: filterBy, mode: 'insensitive' } } },
+        { subCommunity: { name: { contains: filterBy, mode: 'insensitive' } } },
 
-        { Occupation: { name: { contains: filterBy, mode: 'insensitive' } } },
+        { localCommunity: { name: { contains: filterBy, mode: 'insensitive' } } },
 
-        { Committee: { name: { contains: filterBy, mode: 'insensitive' } } },
+        { relation: { name: { contains: filterBy, mode: 'insensitive' } } },
 
-        { Designation: { name: { contains: filterBy, mode: 'insensitive' } } },
-
-        { CurrentActivity: { name: { contains: filterBy, mode: 'insensitive' } } },
-
-        { Education: { name: { contains: filterBy, mode: 'insensitive' } } },
-
-        { SubCommunity: { name: { contains: filterBy, mode: 'insensitive' } } },
-
-        { LocalCommunity: { name: { contains: filterBy, mode: 'insensitive' } } },
-
-        { NativePlace: { name: { contains: filterBy, mode: 'insensitive' } } },
-
-        { Relations: { name: { contains: filterBy, mode: 'insensitive' } } },
-
-        { Gotra: { name: { contains: filterBy, mode: 'insensitive' } } },
-
-        { SubCast: { name: { contains: filterBy, mode: 'insensitive' } } },
+        { subCast: { name: { contains: filterBy, mode: 'insensitive' } } },
       ],
     };
 
