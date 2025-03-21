@@ -42,7 +42,7 @@ export class AuthService {
           user_id: user.id,
           address: input.address,
           city_id: input.city_id,
-          state_id: input.state_id,
+          states_id: input.states_id,
         };
 
         await tx.userAddress.create({

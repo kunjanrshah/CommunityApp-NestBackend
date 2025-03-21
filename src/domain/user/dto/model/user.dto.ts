@@ -103,4 +103,7 @@ export class UserDTO {
 
   @Field(() => UserWorkDetailDTO, { nullable: true }) // Include Address as part of the User response
   userWorkDetail?: UserWorkDetailDTO;
+
+  @Field(() => [String], { nullable: true })
+  matchedFields?: string[];
 }

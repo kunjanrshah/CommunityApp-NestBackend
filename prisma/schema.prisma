@@ -60,12 +60,18 @@ model User {
   userPersonalDetail UserPersonalDetail?
   userWorkDetail     UserWorkDetail?
   userMatrimony      UserMatrimony?
+  subCast            SubCast?            @relation(fields: [last_name_id], references: [id])
+  occupation         Occupation?         @relation(fields: [occupation_id], references: [id])
+  education          Education?          @relation(fields: [education_id], references: [id])
+  relation           Relations?          @relation(fields: [relation_id], references: [id])
+  localCommunity     LocalCommunity?     @relation(fields: [local_community_id], references: [id])
+  subCommunity       SubCommunity?       @relation(fields: [sub_community_id], references: [id])
 }
 
 model UserAddress {
   id            Int      @id @default(autoincrement())
   city_id       Int
-  state_id      Int
+  states_id     Int
   addr_type     AddrType @default(OWN)
   address       String
   area          String?
@@ -74,6 +80,8 @@ model UserAddress {
   mosaad_id     Int?
   user_id       Int?     @unique
   user          User?    @relation(fields: [user_id], references: [id])
+  city          City?    @relation(fields: [city_id], references: [id])
+  states        States?  @relation(fields: [states_id], references: [id])
 }
 
 model UserPersonalDetail {
@@ -97,6 +105,8 @@ model UserPersonalDetail {
 model UserWorkDetail {
   id                   Int     @id @default(autoincrement())
   user_id              Int     @unique
+  committee_id         Int?
+  designation_id       Int?
   business_category_id Int?    @default(0)
   business_address     String?
   business_logo        String?
@@ -104,8 +114,10 @@ model UserWorkDetail {
   website              String?
   work_details         String?
 
-  user                User              @relation(fields: [user_id], references: [id])
-  businessSubCategory BusinessCategory? @relation(fields: [business_category_id], references: [id])
+  user             User              @relation(fields: [user_id], references: [id])
+  businessCategory BusinessCategory? @relation(fields: [business_category_id], references: [id])
+  committee        Committee?        @relation(fields: [committee_id], references: [id])
+  designation      Designation?      @relation(fields: [designation_id], references: [id])
 }
 
 model UserMatrimony {
@@ -126,21 +138,23 @@ model UserMatrimony {
   user User @relation(fields: [user_id], references: [id])
 }
 
-model State {
-  id      Int      @id @default(autoincrement())
-  name    String
-  deleted Boolean
-  updated DateTime
-  cities  City[] // ✅ One-to-Many relationship with City
+model States {
+  id          Int           @id @default(autoincrement())
+  name        String
+  deleted     Boolean
+  updated     DateTime
+  cities      City[] // ✅ One-to-Many relationship with City
+  UserAddress UserAddress[]
 }
 
 model City {
-  id       Int      @id @default(autoincrement())
-  name     String
-  deleted  Boolean
-  updated  DateTime
-  state_id Int // ✅ Foreign Key
-  state    State    @relation(fields: [state_id], references: [id]) // ✅ Relationship Definition
+  id          Int           @id @default(autoincrement())
+  name        String
+  deleted     Boolean
+  updated     DateTime
+  states_id   Int // ✅ Foreign Key
+  states      States        @relation(fields: [states_id], references: [id]) // ✅ Relationship Definition
+  UserAddress UserAddress[]
 }
 
 model BusinessCategory {
@@ -156,20 +170,23 @@ model Occupation {
   name    String
   deleted Boolean
   updated DateTime
+  User    User[]
 }
 
 model Committee {
-  id      Int      @id @default(autoincrement())
-  name    String
-  deleted Boolean
-  updated DateTime
+  id             Int              @id @default(autoincrement())
+  name           String
+  deleted        Boolean
+  updated        DateTime
+  UserWorkDetail UserWorkDetail[]
 }
 
 model Designation {
-  id      Int      @id @default(autoincrement())
-  name    String
-  deleted Boolean
-  updated DateTime
+  id             Int              @id @default(autoincrement())
+  name           String
+  deleted        Boolean
+  updated        DateTime
+  UserWorkDetail UserWorkDetail[]
 }
 
 model CurrentActivity {
@@ -185,6 +202,7 @@ model Education {
   name    String
   deleted Boolean
   updated DateTime
+  User    User[]
 }
 
 model SubCommunity {
@@ -192,6 +210,7 @@ model SubCommunity {
   name    String
   deleted Boolean
   updated DateTime
+  User    User[]
 }
 
 model LocalCommunity {
@@ -199,6 +218,7 @@ model LocalCommunity {
   name    String
   deleted Boolean
   updated DateTime
+  User    User[]
 }
 
 model NativePlace {
@@ -214,6 +234,7 @@ model Relations {
   name    String
   deleted Boolean
   updated DateTime
+  User    User[]
 }
 
 model Gotra {
@@ -229,4 +250,5 @@ model SubCast {
   name    String
   deleted Boolean
   updated DateTime
+  User    User[]
 }

@@ -16,7 +16,7 @@ export class UserAddressDTO {
   city_id: number;
 
   @Field(() => Int)
-  state_id: number;
+  states_id: number;
 
   @Field({ nullable: true })
   local_address?: string;

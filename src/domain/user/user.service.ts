@@ -110,11 +110,11 @@ export class UserService {
         });
 
         // Upsert Address
-        if (data.city_id || data.state_id || data.address) {
+        if (data.city_id || data.states_id || data.address) {
           const addressUpdateData = Object.fromEntries(
             Object.entries({
               city_id: data.city_id,
-              state_id: data.state_id,
+              states_id: data.states_id,
               addr_type: data.addr_type,
               address: data.address,
               area: data.area,
@@ -129,7 +129,7 @@ export class UserService {
             update: addressUpdateData,
             create: {
               city_id: data.city_id!,
-              state_id: data.state_id!,
+              states_id: data.states_id!,
               addr_type: data.addr_type ?? 'OWN',
               address: data.address!,
               area: data.area ?? null,

@@ -145,7 +145,7 @@ export class UpsertUserInput {
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
-  state_id: number;
+  states_id: number;
 
   @Field(() => AddrType, { defaultValue: AddrType.OWN })
   addr_type: AddrType;

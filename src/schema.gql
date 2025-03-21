@@ -13,7 +13,7 @@ type UserAddressDTO {
   user_id: Int!
   address: String!
   city_id: Int!
-  state_id: Int!
+  states_id: Int!
   local_address: String
   mosaad_id: Int
   area: String
@@ -105,6 +105,7 @@ type UserDTO {
   userMatrimony: UserMatrimonyDTO
   userPersonalDetail: UserPersonalDetailDTO
   userWorkDetail: UserWorkDetailDTO
+  matchedFields: [String!]
 }
 
 enum Role {
@@ -129,6 +130,11 @@ type GetMastersResponseDTO {
   last_updated: Int!
 }
 
+type SearchResult {
+  totalRecords: Int!
+  members: [UserDTO!]!
+}
+
 type Query {
   securedResourceforAdmin: String!
   getFamilyMembers(head_id: Float!): [UserDTO!]!
@@ -141,7 +147,14 @@ type Query {
   getRelations(date: String): GetMastersResponseDTO!
   getGotras(date: String): GetMastersResponseDTO!
   getSubCasts(date: String): GetMastersResponseDTO!
+  smartSearch(input: SearchInput!): SearchResult!
   isAppVersionExists(version: Float!): Boolean!
+}
+
+input SearchInput {
+  start: Int! = 0
+  length: Int! = 10
+  filterBy: String
 }
 
 type Mutation {
@@ -189,7 +202,7 @@ input UpsertUserInput {
   last_login: DateTime
   profile_percent: Int! = 5
   city_id: Int
-  state_id: Int
+  states_id: Int
   addr_type: AddrType! = OWN
   address: String
   area: String
@@ -234,7 +247,7 @@ input RegisterInput {
   local_community_id: Int!
   gender: Boolean!
   profile_pic: String! = "noimage.png"
-  state_id: Int!
+  states_id: Int!
   city_id: Int!
   address: String!
 }

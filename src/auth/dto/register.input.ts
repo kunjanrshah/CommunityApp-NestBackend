@@ -1,5 +1,5 @@
 import { InputType, Field, Int, ObjectType } from '@nestjs/graphql';
-import { IsBoolean, IsEmail, IsNumber, IsString, Length } from 'class-validator';
+import { IsBoolean, IsEmail, IsInt, IsNumber, IsString, Length } from 'class-validator';
 
 @InputType()
 export class RegisterInput {
@@ -8,7 +8,7 @@ export class RegisterInput {
   first_name: string;
 
   @Field(() => Int)
-  @IsNumber()
+  @IsInt()
   last_name_id: number;
 
   @Field()
@@ -40,11 +40,11 @@ export class RegisterInput {
   profile_pic: string;
 
   @Field(() => Int)
-  @IsNumber()
-  state_id: number;
+  @IsInt()
+  states_id: number;
 
   @Field(() => Int)
-  @IsNumber()
+  @IsInt()
   city_id: number;
 
   @Field()
