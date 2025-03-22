@@ -27,12 +27,12 @@ model AppVersion {
 }
 
 model User {
-  id                 Int                 @id @default(autoincrement())
-  role               Role                @default(USER)
-  head_id            Int                 @default(0)
-  member_code        String?             @unique // Optional field
-  email              String?             @unique // Optional field
-  mobile             String?             @unique // Optional field
+  id                 Int       @id @default(autoincrement())
+  role               Role      @default(USER)
+  head_id            Int       @default(0)
+  member_code        String?   @unique // Optional field
+  email              String?   @unique // Optional field
+  mobile             String?   @unique // Optional field
   password           String
   relation_id        Int? // Optional field
   sub_community_id   Int?
@@ -41,21 +41,23 @@ model User {
   last_name_id       Int
   father_name        String? // Optional field
   mother_name        String? // Optional field
-  status             Boolean             @default(true)
+  status             Boolean   @default(true)
   gender             Boolean
   phone              String? // Optional field
-  profile_pic        String              @default("noimage.png")
+  profile_pic        String    @default("noimage.png")
   region             String? // Optional field
-  is_expired         Boolean             @default(false)
+  is_expired         Boolean   @default(false)
   expire_date        DateTime? // Optional field
   education_id       Int? // Optional field
   occupation_id      Int? // Optional field
-  deleted            Boolean             @default(false)
+  deleted            Boolean   @default(false)
+  updated            DateTime  @updatedAt
   login_status       Boolean? // Optional field
   last_login         DateTime? // Optional field
-  profile_percent    Float               @default(5)
+  profile_percent    Float     @default(5)
   resetToken         String? // Token for password reset
   resetTokenExpiry   DateTime? // Expiry for reset token
+
   userAddress        UserAddress? // One-to-one relation (Optional)
   userPersonalDetail UserPersonalDetail?
   userWorkDetail     UserWorkDetail?
@@ -141,8 +143,8 @@ model UserMatrimony {
 model States {
   id          Int           @id @default(autoincrement())
   name        String
-  deleted     Boolean
-  updated     DateTime
+  deleted     Boolean       @default(false)
+  updated     DateTime      @updatedAt
   cities      City[] // ✅ One-to-Many relationship with City
   UserAddress UserAddress[]
 }
@@ -150,8 +152,8 @@ model States {
 model City {
   id          Int           @id @default(autoincrement())
   name        String
-  deleted     Boolean
-  updated     DateTime
+  deleted     Boolean       @default(false)
+  updated     DateTime      @updatedAt
   states_id   Int // ✅ Foreign Key
   states      States        @relation(fields: [states_id], references: [id]) // ✅ Relationship Definition
   UserAddress UserAddress[]
@@ -160,95 +162,95 @@ model City {
 model BusinessCategory {
   id             Int              @id @default(autoincrement())
   name           String
-  deleted        Boolean
-  updated        DateTime
+  deleted        Boolean          @default(false)
+  updated        DateTime         @updatedAt
   UserWorkDetail UserWorkDetail[]
 }
 
 model Occupation {
   id      Int      @id @default(autoincrement())
   name    String
-  deleted Boolean
-  updated DateTime
+  deleted Boolean  @default(false)
+  updated DateTime @updatedAt
   User    User[]
 }
 
 model Committee {
   id             Int              @id @default(autoincrement())
   name           String
-  deleted        Boolean
-  updated        DateTime
+  deleted        Boolean          @default(false)
+  updated        DateTime         @updatedAt
   UserWorkDetail UserWorkDetail[]
 }
 
 model Designation {
   id             Int              @id @default(autoincrement())
   name           String
-  deleted        Boolean
-  updated        DateTime
+  deleted        Boolean          @default(false)
+  updated        DateTime         @updatedAt
   UserWorkDetail UserWorkDetail[]
 }
 
 model CurrentActivity {
   id                 Int                  @id @default(autoincrement())
   name               String
-  deleted            Boolean
-  updated            DateTime
+  deleted            Boolean              @default(false)
+  updated            DateTime             @updatedAt
   UserPersonalDetail UserPersonalDetail[]
 }
 
 model Education {
   id      Int      @id @default(autoincrement())
   name    String
-  deleted Boolean
-  updated DateTime
+  deleted Boolean  @default(false)
+  updated DateTime @updatedAt
   User    User[]
 }
 
 model SubCommunity {
   id      Int      @id @default(autoincrement())
   name    String
-  deleted Boolean
-  updated DateTime
+  deleted Boolean  @default(false)
+  updated DateTime @updatedAt
   User    User[]
 }
 
 model LocalCommunity {
   id      Int      @id @default(autoincrement())
   name    String
-  deleted Boolean
-  updated DateTime
+  deleted Boolean  @default(false)
+  updated DateTime @updatedAt
   User    User[]
 }
 
 model NativePlace {
   id                 Int                  @id @default(autoincrement())
   name               String
-  deleted            Boolean
-  updated            DateTime
+  deleted            Boolean              @default(false)
+  updated            DateTime             @updatedAt
   UserPersonalDetail UserPersonalDetail[]
 }
 
 model Relations {
   id      Int      @id @default(autoincrement())
   name    String
-  deleted Boolean
-  updated DateTime
+  deleted Boolean  @default(false)
+  updated DateTime @updatedAt
   User    User[]
 }
 
 model Gotra {
   id                 Int                  @id @default(autoincrement())
   name               String
-  deleted            Boolean
-  updated            DateTime
+  deleted            Boolean              @default(false)
+  updated            DateTime             @updatedAt
   UserPersonalDetail UserPersonalDetail[]
 }
 
 model SubCast {
   id      Int      @id @default(autoincrement())
   name    String
-  deleted Boolean
-  updated DateTime
+  deleted Boolean  @default(false)
+  updated DateTime @updatedAt
   User    User[]
 }
