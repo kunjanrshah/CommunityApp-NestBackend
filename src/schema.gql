@@ -31,7 +31,7 @@ type UserMatrimonyDTO {
   id: Int
   user_id: Int!
   birth_time: String
-  birth_place: String
+  birth_place_id: Int!
   hobby: String!
   about_me: String
   weight: Float
@@ -89,7 +89,7 @@ type UserDTO {
   father_name: String
   mother_name: String
   status: Boolean!
-  gender: String!
+  gender: Boolean!
   phone: String
   profile_pic: String!
   region: String
@@ -101,6 +101,7 @@ type UserDTO {
   login_status: Boolean
   last_login: DateTime
   profile_percent: Float!
+  updated: DateTime
   userAddress: UserAddressDTO
   userMatrimony: UserMatrimonyDTO
   userPersonalDetail: UserPersonalDetailDTO
@@ -148,6 +149,7 @@ type Query {
   getGotras(date: String): GetMastersResponseDTO!
   getSubCasts(date: String): GetMastersResponseDTO!
   smartSearch(input: SearchInput!): SearchResult!
+  smartFilter(input: SearchRequestDTO!): SearchResult!
   isAppVersionExists(version: Float!): Boolean!
 }
 
@@ -155,6 +157,60 @@ input SearchInput {
   start: Int! = 0
   length: Int! = 10
   filterBy: String
+}
+
+input SearchRequestDTO {
+  start: Int! = 0
+  length: Int! = 10
+  filter_by: SmartFilterDto
+}
+
+input SmartFilterDto {
+  last_name_id: Int
+  local_community_id: Int
+  sub_community_id: Int
+  native_place_id: Int
+  city_id: Int
+  member_code: String
+  head_name: String
+  first_name: String
+  father_name: String
+  mother_name: String
+  gender: Boolean
+  marital_status: String
+  min_age: Int
+  max_age: Int
+  min_height: Int
+  max_height: Int
+  min_weight: Int
+  max_weight: Int
+  min_percentage: Int
+  max_percentage: Int
+  state_id: Int
+  email_address: String
+  mobile: String
+  local_address: String
+  address: String
+  pincode: String
+  area: String
+  business_address: String
+  education_id: Int
+  gotra_id: Int
+  business_category_id: Int
+  occupation_id: Int
+  birth_place_id: Int
+  birth_date: String
+  marriage_date: String
+  expire_date: String
+  updated_dt: String
+  blood_group: String
+  is_donor: Boolean
+  is_rented: Boolean
+  is_expired: Boolean
+  is_spect: Boolean
+  matrimony: Boolean
+  is_shani: Boolean
+  is_mangal: Boolean
 }
 
 type Mutation {
@@ -225,7 +281,7 @@ input UpsertUserInput {
   website: String
   work_details: String
   birth_time: String
-  birth_place: String
+  birth_place_id: Float
   hobby: String
   about_me: String
   weight: Float

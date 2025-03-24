@@ -17,11 +17,10 @@ export class UserMatrimonyDTO {
   @IsString()
   birth_time?: string;
 
-  @Field({ nullable: true }) // Birth place (Optional)
+  @Field(() => Int) // Required user_id (Must be provided)
   @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  birth_place?: string;
+  @IsInt()
+  birth_place_id?: number;
 
   @Field() // Hobby (Required)
   @IsString()

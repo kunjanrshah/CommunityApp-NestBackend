@@ -27,9 +27,6 @@ export class CountListDTO {
   local_community: string;
 
   @Field(() => String)
-  native_place: string;
-
-  @Field(() => String)
   occupation: string;
 
   @Field(() => String)

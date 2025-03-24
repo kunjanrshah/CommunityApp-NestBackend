@@ -94,7 +94,7 @@ model UserPersonalDetail {
   matrimony           Boolean          @default(false)
   birth_date          DateTime?
   native_place_id     Int?
-  native_place        NativePlace?     @relation(fields: [native_place_id], references: [id], onDelete: SetNull)
+  native_place        City?            @relation(fields: [native_place_id], references: [id], onDelete: SetNull)
   blood_group         String?
   current_activity_id Int?
   current_activity    CurrentActivity? @relation(fields: [current_activity_id], references: [id], onDelete: SetNull)
@@ -123,21 +123,22 @@ model UserWorkDetail {
 }
 
 model UserMatrimony {
-  id               Int     @id @default(autoincrement())
-  user_id          Int     @unique
-  birth_time       String?
-  birth_place      String? @db.VarChar(100)
+  id               Int       @id @default(autoincrement())
+  user_id          Int       @unique
+  birth_time       DateTime?
+  birth_place_id   Int?
   hobby            String
   about_me         String?
   weight           Float?
   height           Float?
-  is_spect         Boolean @default(false)
-  is_mangal        Boolean @default(false)
-  is_shani         Boolean @default(false)
-  facebook_profile String? @db.VarChar(255)
-  expectation      String? @db.VarChar(255)
+  is_spect         Boolean   @default(false)
+  is_mangal        Boolean   @default(false)
+  is_shani         Boolean   @default(false)
+  facebook_profile String?   @db.VarChar(255)
+  expectation      String?   @db.VarChar(255)
 
-  user User @relation(fields: [user_id], references: [id])
+  birth_place City? @relation(fields: [birth_place_id], references: [id])
+  user        User  @relation(fields: [user_id], references: [id])
 }
 
 model States {
@@ -150,13 +151,15 @@ model States {
 }
 
 model City {
-  id          Int           @id @default(autoincrement())
-  name        String
-  deleted     Boolean       @default(false)
-  updated     DateTime      @updatedAt
-  states_id   Int // ✅ Foreign Key
-  states      States        @relation(fields: [states_id], references: [id]) // ✅ Relationship Definition
-  UserAddress UserAddress[]
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  deleted            Boolean              @default(false)
+  updated            DateTime             @updatedAt
+  states_id          Int // ✅ Foreign Key
+  states             States               @relation(fields: [states_id], references: [id]) // ✅ Relationship Definition
+  UserAddress        UserAddress[]
+  UserPersonalDetail UserPersonalDetail[]
+  UserMatrimony      UserMatrimony[]
 }
 
 model BusinessCategory {
@@ -221,14 +224,6 @@ model LocalCommunity {
   deleted Boolean  @default(false)
   updated DateTime @updatedAt
   User    User[]
-}
-
-model NativePlace {
-  id                 Int                  @id @default(autoincrement())
-  name               String
-  deleted            Boolean              @default(false)
-  updated            DateTime             @updatedAt
-  UserPersonalDetail UserPersonalDetail[]
 }
 
 model Relations {

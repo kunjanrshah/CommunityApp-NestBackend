@@ -174,7 +174,7 @@ export class UserService {
           const matrimonyUpdateData = Object.fromEntries(
             Object.entries({
               birth_time: data.birth_time,
-              birth_place: data.birth_place,
+              birth_place_id: data.birth_place_id,
               hobby: data.hobby,
               about_me: data.about_me,
               weight: data.weight,
@@ -193,7 +193,7 @@ export class UserService {
             create: {
               user_id: user.id,
               birth_time: data.birth_time ?? null,
-              birth_place: data.birth_place ?? null,
+              birth_place_id: data.birth_place_id ?? null,
               hobby: data.hobby!,
               about_me: data.about_me ?? null,
               weight: data.weight ?? null,

@@ -57,7 +57,7 @@ export class UserDTO {
   status: boolean;
 
   @Field()
-  gender: string;
+  gender: boolean;
 
   @Field({ nullable: true })
   phone?: string;
@@ -91,6 +91,9 @@ export class UserDTO {
 
   @Field(() => Float, { defaultValue: 5 })
   profile_percent: number;
+
+  @Field({ nullable: true })
+  updated?: Date;
 
   @Field(() => UserAddressDTO, { nullable: true }) // Include Address as part of the User response
   userAddress?: UserAddressDTO;

@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class AppSearchService {
+export class SmartSearchService {
   constructor(private prisma: PrismaService) {}
 
   async smartSearch(start: number, length: number, filterBy?: string) {

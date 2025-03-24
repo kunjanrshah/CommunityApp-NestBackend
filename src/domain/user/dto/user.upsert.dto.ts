@@ -243,7 +243,7 @@ export class UpsertUserInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  birth_place?: string;
+  birth_place_id?: number;
 
   @Field({ nullable: true })
   @IsOptional()
