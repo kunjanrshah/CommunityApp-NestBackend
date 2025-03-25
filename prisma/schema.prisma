@@ -68,6 +68,7 @@ model User {
   relation           Relations?          @relation(fields: [relation_id], references: [id])
   localCommunity     LocalCommunity?     @relation(fields: [local_community_id], references: [id])
   subCommunity       SubCommunity?       @relation(fields: [sub_community_id], references: [id])
+  userLocations      UserLocation[]
 }
 
 model UserAddress {
@@ -248,4 +249,15 @@ model SubCast {
   deleted Boolean  @default(false)
   updated DateTime @updatedAt
   User    User[]
+}
+
+model UserLocation {
+  id                 Int     @id @default(autoincrement()) // Unique identifier
+  user_id            Int
+  location_type      String // Can be 'Home', 'Office', or 'User'
+  latitude           Float
+  longitude          Float
+  is_location_enable Boolean @default(false)
+
+  user User @relation(fields: [user_id], references: [id])
 }

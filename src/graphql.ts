@@ -1,4 +1,3 @@
-
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -76,6 +75,16 @@ export interface SmartFilterDto {
     matrimony?: Nullable<boolean>;
     is_shani?: Nullable<boolean>;
     is_mangal?: Nullable<boolean>;
+}
+
+export interface GetNearbyUsersInput {
+    lat: number;
+    lng: number;
+    km: number;
+    nearBy?: Nullable<string>;
+    start?: Nullable<number>;
+    length?: Nullable<number>;
+    subCommunityId?: Nullable<number>;
 }
 
 export interface ChangePasswordInput {
@@ -270,6 +279,8 @@ export interface UserDTO {
     userPersonalDetail?: Nullable<UserPersonalDetailDTO>;
     userWorkDetail?: Nullable<UserWorkDetailDTO>;
     matchedFields?: Nullable<string[]>;
+    distance?: Nullable<string>;
+    nearBy?: Nullable<string>;
 }
 
 export interface ChangePasswordResponse {
@@ -308,6 +319,7 @@ export interface IQuery {
     getSubCasts(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     smartSearch(input: SearchInput): SearchResult | Promise<SearchResult>;
     smartFilter(input: SearchRequestDTO): SearchResult | Promise<SearchResult>;
+    nearByUsers(filter: GetNearbyUsersInput): SearchResult | Promise<SearchResult>;
     isAppVersionExists(version: number): boolean | Promise<boolean>;
 }
 

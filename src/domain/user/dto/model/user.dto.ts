@@ -109,4 +109,10 @@ export class UserDTO {
 
   @Field(() => [String], { nullable: true })
   matchedFields?: string[];
+
+  @Field(() => String, { nullable: true })
+  distance?: string; //"3.2, 5.6"
+
+  @Field(() => String, { nullable: true })
+  nearBy?: string; // "home", "office", or "user"
 }

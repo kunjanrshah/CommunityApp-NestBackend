@@ -34,6 +34,9 @@ importers:
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
+      geolib:
+        specifier: ^3.3.4
+        version: 3.3.4
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -4865,6 +4868,12 @@ packages:
         integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==,
       }
     engines: { node: ">=6.9.0" }
+
+  geolib@3.3.4:
+    resolution:
+      {
+        integrity: sha512-EicrlLLL3S42gE9/wde+11uiaYAaeSVDwCUIv2uMIoRBfNJCn8EsSI+6nS3r4TCKDO6+RQNM9ayLq2at+oZQWQ==,
+      }
 
   get-caller-file@2.0.5:
     resolution:
@@ -12809,6 +12818,8 @@ snapshots:
   functions-have-names@1.2.3: {}
 
   gensync@1.0.0-beta.2: {}
+
+  geolib@3.3.4: {}
 
   get-caller-file@2.0.5: {}
 

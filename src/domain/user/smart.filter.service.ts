@@ -7,7 +7,7 @@ import { AddrType, Prisma } from '@prisma/client';
 export class SmartFilterService {
   constructor(private prisma: PrismaService) {}
 
-  async get_search_datatables(searchRequest: SearchRequestDTO) {
+  async smartFilter(searchRequest: SearchRequestDTO) {
     const { start, length, filter_by } = searchRequest;
 
     const where: Prisma.UserWhereInput = {};

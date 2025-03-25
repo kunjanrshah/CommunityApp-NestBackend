@@ -107,6 +107,8 @@ type UserDTO {
   userPersonalDetail: UserPersonalDetailDTO
   userWorkDetail: UserWorkDetailDTO
   matchedFields: [String!]
+  distance: String
+  nearBy: String
 }
 
 enum Role {
@@ -150,6 +152,7 @@ type Query {
   getSubCasts(date: String): GetMastersResponseDTO!
   smartSearch(input: SearchInput!): SearchResult!
   smartFilter(input: SearchRequestDTO!): SearchResult!
+  nearByUsers(filter: GetNearbyUsersInput!): SearchResult!
   isAppVersionExists(version: Float!): Boolean!
 }
 
@@ -211,6 +214,16 @@ input SmartFilterDto {
   matrimony: Boolean
   is_shani: Boolean
   is_mangal: Boolean
+}
+
+input GetNearbyUsersInput {
+  lat: Float!
+  lng: Float!
+  km: Int! = 10
+  nearBy: String
+  start: Int
+  length: Int
+  subCommunityId: Int
 }
 
 type Mutation {
