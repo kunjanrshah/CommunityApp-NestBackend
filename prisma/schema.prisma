@@ -82,7 +82,7 @@ model UserAddress {
   local_address String?
   mosaad_id     Int?
   user_id       Int?     @unique
-  user          User?    @relation(fields: [user_id], references: [id])
+  user          User?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   city          City?    @relation(fields: [city_id], references: [id])
   states        States?  @relation(fields: [states_id], references: [id])
 }
@@ -117,10 +117,10 @@ model UserWorkDetail {
   website              String?
   work_details         String?
 
-  user             User              @relation(fields: [user_id], references: [id])
-  businessCategory BusinessCategory? @relation(fields: [business_category_id], references: [id])
-  committee        Committee?        @relation(fields: [committee_id], references: [id])
-  designation      Designation?      @relation(fields: [designation_id], references: [id])
+  user             User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  businessCategory BusinessCategory? @relation(fields: [business_category_id], references: [id], onDelete: Cascade)
+  committee        Committee?        @relation(fields: [committee_id], references: [id], onDelete: Cascade)
+  designation      Designation?      @relation(fields: [designation_id], references: [id], onDelete: Cascade)
 }
 
 model UserMatrimony {
@@ -139,7 +139,7 @@ model UserMatrimony {
   expectation      String?   @db.VarChar(255)
 
   birth_place City? @relation(fields: [birth_place_id], references: [id])
-  user        User  @relation(fields: [user_id], references: [id])
+  user        User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model States {
@@ -259,5 +259,5 @@ model UserLocation {
   longitude          Float
   is_location_enable Boolean @default(false)
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

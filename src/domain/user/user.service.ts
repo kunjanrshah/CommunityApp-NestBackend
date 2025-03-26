@@ -330,16 +330,23 @@ export class UserService {
     });
   }
 
-  // async deleteUser(id: number): Promise<string> {
-  //   try {
-  //     await this.prisma.user.delete({
-  //       where: { id },
-  //     });
-  //     return `User with ID ${id} has been successfully deleted.`;
-  //   } catch (error) {
-  //     return `Failed to delete user with ID ${id}: ${error.message}`;
-  //   }
-  // }
+  async deleteUser(id: number): Promise<string> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+        select: { head_id: true },
+      });
+
+      if (!user) return 'User not found.';
+      if (user.head_id === 0) return 'Cannot delete head user.';
+
+      await this.prisma.user.delete({ where: { id } });
+
+      return 'User deleted successfully.';
+    } catch (error) {
+      return 'Failed to delete user. ' + error.message;
+    }
+  }
 
   // async findUserById(id: number) {
   //   const user = await this.prisma.user.findUnique({ where: { id } });

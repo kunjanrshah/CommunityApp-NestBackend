@@ -328,6 +328,7 @@ export interface IMutation {
     changePassword(ChangePasswordInput: ChangePasswordInput): ChangePasswordResponse | Promise<ChangePasswordResponse>;
     upsertUser(upsertUserInput: UpsertUserInput): UserDTO | Promise<UserDTO>;
     updateLastLogin(user_id: number): boolean | Promise<boolean>;
+    deleteUserById(userId: number): string | Promise<string>;
     register(RegisterInput: RegisterInput): AuthResponse | Promise<AuthResponse>;
     login(LoginInput: LoginInput): AuthResponse | Promise<AuthResponse>;
     refreshToken(token: string): AuthResponse | Promise<AuthResponse>;

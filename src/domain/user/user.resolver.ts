@@ -54,6 +54,11 @@ export class UserResolver {
     return this.userService.getUsersByDateRange(fromDate, toDate, page, limit);
   }
 
+  @Mutation(() => String)
+  deleteUserById(@Args({ name: 'userId', type: () => Int }) id: number) {
+    return this.userService.deleteUser(id);
+  }
+
   // @Query(() => String)
   // getProtectedData(@Context() context) {
   //   return `Hello ${context.req.user.email}, this is protected data!`;
@@ -77,11 +82,6 @@ export class UserResolver {
   // @Query(() => [UserSchema])
   // getAllUsersByFilter() {
   //   return this.userService.getAllUsersByFilter();
-  // }
-
-  // @Mutation(() => String)
-  // deleteUserById(@Args({ name: 'userId', type: () => Int }) id: number) {
-  //   return this.userService.deleteUser(id);
   // }
 
   // @Mutation(() => UserSchema)

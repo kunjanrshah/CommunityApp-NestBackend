@@ -230,6 +230,7 @@ type Mutation {
   changePassword(ChangePasswordInput: ChangePasswordInput!): ChangePasswordResponse!
   upsertUser(upsertUserInput: UpsertUserInput!): UserDTO!
   updateLastLogin(user_id: Int!): Boolean!
+  deleteUserById(userId: Int!): String!
   register(RegisterInput: RegisterInput!): AuthResponse!
   login(LoginInput: LoginInput!): AuthResponse!
   refreshToken(token: String!): AuthResponse!
