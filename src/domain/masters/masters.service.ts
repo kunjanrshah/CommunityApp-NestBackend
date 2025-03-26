@@ -6,6 +6,7 @@ import {
   UserCountsDTO,
 } from './dto/model/masters-count.dto';
 import { GetMastersResponseDTO } from './dto/model/get-masters.dto';
+import { CityDTO } from './dto/model/getcity.dto';
 
 @Injectable()
 export class MastersCountService {
@@ -137,5 +138,12 @@ export class MastersCountService {
         last_updated: 0,
       };
     }
+  }
+
+  async getCitiesByState(stateId: number): Promise<CityDTO[]> {
+    return this.prisma.city.findMany({
+      where: { states_id: stateId, deleted: false },
+      select: { id: true, name: true },
+    });
   }
 }

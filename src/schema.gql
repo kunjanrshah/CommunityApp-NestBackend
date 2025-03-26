@@ -133,6 +133,11 @@ type GetMastersResponseDTO {
   last_updated: Int!
 }
 
+type CityDTO {
+  id: Int!
+  name: String!
+}
+
 type SearchResult {
   totalRecords: Int!
   members: [UserDTO!]!
@@ -150,6 +155,7 @@ type Query {
   getRelations(date: String): GetMastersResponseDTO!
   getGotras(date: String): GetMastersResponseDTO!
   getSubCasts(date: String): GetMastersResponseDTO!
+  getCitiesByState(stateId: Int!): [CityDTO!]!
   smartSearch(input: SearchInput!): SearchResult!
   smartFilter(input: SearchRequestDTO!): SearchResult!
   nearByUsers(filter: GetNearbyUsersInput!): SearchResult!
