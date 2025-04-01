@@ -6,6 +6,8 @@ import {
   UserCountsDTO,
 } from './dto/model/masters-count.dto';
 import { GetMastersResponseDTO } from './dto/model/get-masters.dto';
+import { StatisticsResponseDto } from './dto/model/statistics-response.dto';
+import { StatisticsInputDto } from './dto/statistics-input.dto';
 
 @Injectable()
 export class MastersCountService {
@@ -202,6 +204,84 @@ export class MastersCountService {
       data: filteredCities,
       deleted: deletedCities.map((c) => c.id),
       last_updated: lastUpdatedCity?.updated?.toISOString() || null,
+    };
+  }
+
+  async getStatistics(input: StatisticsInputDto): Promise<StatisticsResponseDto> {
+    const { cityId, subCommunityId, localCommunityId } = input;
+
+    // Common filter conditions
+    const baseFilter = {
+      is_expired: false,
+      ...(subCommunityId && { sub_community_id: subCommunityId }),
+      ...(localCommunityId && { local_community_id: localCommunityId }),
+      ...(cityId && { userAddress: { city_id: cityId } }), // Use city_id from UserAddress relation
+    };
+
+    // Get current year
+    const currentYear = new Date().getFullYear();
+
+    // Define birth date conditions
+    const boyDate = new Date(`${currentYear - 21}-01-01`);
+    const girlDate = new Date(`${currentYear - 18}-01-01`);
+
+    // Fetch statistics using Prisma queries
+    const [
+      totalFamily,
+      totalMembers,
+      totalMale,
+      totalFemale,
+      totalUnmarriedMale,
+      totalUnmarriedFemale,
+      totalInterestedMale,
+      totalInterestedFemale,
+    ] = await Promise.all([
+      this.prisma.user.count({ where: { ...baseFilter, head_id: 0 } }),
+      this.prisma.user.count({ where: baseFilter }),
+      this.prisma.user.count({ where: { ...baseFilter, gender: true } }),
+      this.prisma.user.count({ where: { ...baseFilter, gender: false } }),
+      this.prisma.user.count({
+        where: {
+          ...baseFilter,
+          gender: true,
+          userPersonalDetail: { marital_status: 'Unmarried', birth_date: { gte: boyDate } },
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          ...baseFilter,
+          gender: false,
+          userPersonalDetail: { marital_status: 'Unmarried', birth_date: { gte: girlDate } },
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          ...baseFilter,
+          gender: true,
+          userPersonalDetail: { matrimony: true },
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          ...baseFilter,
+          gender: false,
+          userPersonalDetail: { matrimony: true },
+        },
+      }),
+    ]);
+
+    return {
+      success: true,
+      data: {
+        TotalFamily: totalFamily,
+        TotalMembers: totalMembers,
+        TotalMale: totalMale,
+        TotalFemale: totalFemale,
+        TotalUnmarriedMale: totalUnmarriedMale,
+        TotalUnmarriedFemale: totalUnmarriedFemale,
+        TotalInterestedMale: totalInterestedMale,
+        TotalInterestedFemale: totalInterestedFemale,
+      },
     };
   }
 }

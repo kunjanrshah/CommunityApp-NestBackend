@@ -1,4 +1,3 @@
-
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -21,6 +20,12 @@ export enum Role {
 export interface GetInactiveUsersInput {
     start?: Nullable<number>;
     limit?: Nullable<number>;
+    subCommunityId?: Nullable<number>;
+    localCommunityId?: Nullable<number>;
+}
+
+export interface StatisticsInputDto {
+    cityId?: Nullable<number>;
     subCommunityId?: Nullable<number>;
     localCommunityId?: Nullable<number>;
 }
@@ -327,6 +332,22 @@ export interface CityResponseDto {
     last_updated?: Nullable<string>;
 }
 
+export interface StatisticsDataDto {
+    TotalFamily: number;
+    TotalMembers: number;
+    TotalMale: number;
+    TotalFemale: number;
+    TotalUnmarriedMale: number;
+    TotalUnmarriedFemale: number;
+    TotalInterestedMale: number;
+    TotalInterestedFemale: number;
+}
+
+export interface StatisticsResponseDto {
+    success: boolean;
+    data: StatisticsDataDto;
+}
+
 export interface SearchResult {
     totalRecords: number;
     members: UserDTO[];
@@ -347,6 +368,7 @@ export interface IQuery {
     getGotras(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getSubCasts(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getCitiesByState(stateId: number, date?: Nullable<string>, subCommunityId?: Nullable<number>): CityResponseDto | Promise<CityResponseDto>;
+    getStatistics(input: StatisticsInputDto): StatisticsResponseDto | Promise<StatisticsResponseDto>;
     smartSearch(input: SearchInput): SearchResult | Promise<SearchResult>;
     smartFilter(input: SearchRequestDTO): SearchResult | Promise<SearchResult>;
     nearByUsers(filter: GetNearbyUsersInput): SearchResult | Promise<SearchResult>;

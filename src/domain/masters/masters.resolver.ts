@@ -3,6 +3,8 @@ import { MastersCountService } from './masters.service';
 import { MastersModel } from './schema/masters.schema';
 import { GetMastersResponseDTO } from './dto/model/get-masters.dto';
 import { CityResponseDto } from './dto/model/getcity.dto';
+import { StatisticsResponseDto } from './dto/model/statistics-response.dto';
+import { StatisticsInputDto } from './dto/statistics-input.dto';
 
 // Masters ADD/UPDATE RESOLVER PENDING SHOULD BE WITH CURRENT DATE
 @Resolver(() => MastersModel)
@@ -113,5 +115,10 @@ export class MastersResolver {
     @Args('subCommunityId', { type: () => Int, nullable: true }) subCommunityId?: number,
   ) {
     return this.mastersService.getCitiesByState(stateId, date, subCommunityId);
+  }
+
+  @Query(() => StatisticsResponseDto)
+  async getStatistics(@Args('input') input: StatisticsInputDto): Promise<StatisticsResponseDto> {
+    return this.mastersService.getStatistics(input);
   }
 }

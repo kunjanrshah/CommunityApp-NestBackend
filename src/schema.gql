@@ -145,6 +145,22 @@ type CityResponseDto {
   last_updated: String
 }
 
+type StatisticsDataDto {
+  TotalFamily: Int!
+  TotalMembers: Int!
+  TotalMale: Int!
+  TotalFemale: Int!
+  TotalUnmarriedMale: Int!
+  TotalUnmarriedFemale: Int!
+  TotalInterestedMale: Int!
+  TotalInterestedFemale: Int!
+}
+
+type StatisticsResponseDto {
+  success: Boolean!
+  data: StatisticsDataDto!
+}
+
 type SearchResult {
   totalRecords: Int!
   members: [UserDTO!]!
@@ -165,6 +181,7 @@ type Query {
   getGotras(date: String): GetMastersResponseDTO!
   getSubCasts(date: String): GetMastersResponseDTO!
   getCitiesByState(stateId: Int!, date: String, subCommunityId: Int): CityResponseDto!
+  getStatistics(input: StatisticsInputDto!): StatisticsResponseDto!
   smartSearch(input: SearchInput!): SearchResult!
   smartFilter(input: SearchRequestDTO!): SearchResult!
   nearByUsers(filter: GetNearbyUsersInput!): SearchResult!
@@ -174,6 +191,12 @@ type Query {
 input GetInactiveUsersInput {
   start: Int
   limit: Int
+  subCommunityId: Int
+  localCommunityId: Int
+}
+
+input StatisticsInputDto {
+  cityId: Int
   subCommunityId: Int
   localCommunityId: Int
 }
