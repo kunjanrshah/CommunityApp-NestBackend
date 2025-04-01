@@ -2,6 +2,8 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { UpsertUserInput } from './dto/user.upsert.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
+import { ChangeRoleInput } from './dto/change-role.dto';
+import { GetInactiveUsersInput } from './dto/get-inactive-users.dto';
 
 @Injectable()
 export class UserService {
@@ -346,6 +348,94 @@ export class UserService {
     } catch (error) {
       return 'Failed to delete user. ' + error.message;
     }
+  }
+
+  async changeRole(input: ChangeRoleInput): Promise<string> {
+    const { idList, role, subCommunityId, localCommunityId } = input;
+
+    try {
+      // Validate users exist
+      const users = await this.prisma.user.findMany({
+        where: { id: { in: idList } },
+      });
+
+      if (!users.length) {
+        throw new BadRequestException('No matching users found.');
+      }
+
+      // Update users
+      await this.prisma.user.updateMany({
+        where: { id: { in: idList } },
+        data: {
+          role,
+          ...(subCommunityId && { sub_community_id: subCommunityId }),
+          ...(localCommunityId && { local_community_id: localCommunityId }),
+        },
+      });
+
+      return 'Role changed successfully.';
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Failed to update roles.');
+    }
+  }
+
+  async getInactiveUsers(input: GetInactiveUsersInput) {
+    const { start, limit, subCommunityId, localCommunityId } = input;
+
+    return this.prisma.user.findMany({
+      where: {
+        status: false, // status!=1 (false means inactive)
+        deleted: false,
+        OR: [
+          subCommunityId ? { sub_community_id: subCommunityId } : {},
+          localCommunityId ? { local_community_id: localCommunityId } : {},
+        ],
+      },
+      skip: start || 0,
+      take: limit || 10,
+      include: {
+        userAddress: true,
+        userMatrimony: true,
+        userPersonalDetail: true,
+        userWorkDetail: true,
+      },
+    });
+  }
+
+  async getSharedProfiles(userId: number) {
+    // Find UserLocation for the given user
+    const userLocation = await this.prisma.userLocation.findFirst({
+      where: { user_id: userId },
+      select: { sharing_id: true },
+    });
+
+    if (!userLocation || !userLocation.sharing_id) {
+      return [];
+    }
+
+    // Extract shared user IDs
+    const sharedUserIds = userLocation.sharing_id.split(',').map(Number);
+
+    // Fetch users whose IDs are in sharing_id
+    return this.prisma.user.findMany({
+      where: { id: { in: sharedUserIds } },
+    });
+  }
+
+  // Get users who have shared their profile with the given userId
+  async getSharingProfiles(userId: number) {
+    const userLocations = await this.prisma.userLocation.findMany({
+      where: {
+        sharing_id: { contains: `${userId}` },
+      },
+      select: { user_id: true },
+    });
+
+    const sharingUserIds = userLocations.map((loc) => loc.user_id);
+
+    return this.prisma.user.findMany({
+      where: { id: { in: sharingUserIds } },
+    });
   }
 
   // async findUserById(id: number) {

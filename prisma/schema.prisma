@@ -257,6 +257,7 @@ model UserLocation {
   location_type      String // Can be 'Home', 'Office', or 'User'
   latitude           Float
   longitude          Float
+  sharing_id         String
   is_location_enable Boolean @default(false)
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)

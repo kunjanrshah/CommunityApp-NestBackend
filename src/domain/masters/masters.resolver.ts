@@ -2,7 +2,7 @@ import { Args, Int, Query, Resolver } from '@nestjs/graphql';
 import { MastersCountService } from './masters.service';
 import { MastersModel } from './schema/masters.schema';
 import { GetMastersResponseDTO } from './dto/model/get-masters.dto';
-import { CityDTO } from './dto/model/getcity.dto';
+import { CityResponseDto } from './dto/model/getcity.dto';
 
 // Masters ADD/UPDATE RESOLVER PENDING SHOULD BE WITH CURRENT DATE
 @Resolver(() => MastersModel)
@@ -106,10 +106,12 @@ export class MastersResolver {
     return this.mastersService.getRecords('subCast', date);
   }
 
-  @Query(() => [CityDTO], { name: 'getCitiesByState' })
+  @Query(() => CityResponseDto)
   async getCitiesByState(
     @Args('stateId', { type: () => Int }) stateId: number,
-  ): Promise<CityDTO[]> {
-    return this.mastersService.getCitiesByState(stateId);
+    @Args('date', { type: () => String, nullable: true }) date?: string,
+    @Args('subCommunityId', { type: () => Int, nullable: true }) subCommunityId?: number,
+  ) {
+    return this.mastersService.getCitiesByState(stateId, date, subCommunityId);
   }
 }

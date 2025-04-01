@@ -6,7 +6,6 @@ import {
   UserCountsDTO,
 } from './dto/model/masters-count.dto';
 import { GetMastersResponseDTO } from './dto/model/get-masters.dto';
-import { CityDTO } from './dto/model/getcity.dto';
 
 @Injectable()
 export class MastersCountService {
@@ -140,10 +139,69 @@ export class MastersCountService {
     }
   }
 
-  async getCitiesByState(stateId: number): Promise<CityDTO[]> {
-    return this.prisma.city.findMany({
-      where: { states_id: stateId, deleted: false },
+  async getCitiesByState(stateId: number, date?: string, subCommunityId?: number) {
+    let dateFilter = undefined;
+
+    if (date) {
+      const parsedDate = new Date(Number(date));
+      if (!isNaN(parsedDate.getTime())) {
+        dateFilter = parsedDate;
+      }
+    }
+
+    let cities = await this.prisma.city.findMany({
+      where: {
+        states_id: stateId,
+        ...(dateFilter && { updated: { gte: dateFilter } }),
+      },
+      orderBy: { name: 'asc' },
       select: { id: true, name: true },
     });
+
+    // If no cities found, return empty response
+    if (!cities.length) return { data: [], deleted: [], last_updated: null };
+
+    // Fetch user count for each city
+    const cityCounts = await Promise.all(
+      cities.map(async (city) => {
+        const count = await this.prisma.userAddress.count({
+          where: {
+            city_id: city.id,
+            user: {
+              is_expired: false,
+              status: true,
+              sub_community_id: subCommunityId ? subCommunityId : undefined,
+            },
+          },
+        });
+
+        return { ...city, count };
+      }),
+    );
+
+    // Sort by count (desc) then by name (asc)
+    cityCounts.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+    // Filter out cities with zero users
+    const filteredCities = cityCounts.filter((city) => city.count > 0);
+
+    // Fetch deleted and last updated city records
+    const deletedCities = await this.prisma.city.findMany({
+      where: { deleted: true },
+      select: { id: true },
+    });
+
+    const lastUpdatedCity = await this.prisma.city.findFirst({
+      orderBy: { updated: 'desc' },
+      select: { updated: true },
+    });
+
+    console.log('filteredCities: ', JSON.stringify(filteredCities));
+
+    return {
+      data: filteredCities,
+      deleted: deletedCities.map((c) => c.id),
+      last_updated: lastUpdatedCity?.updated?.toISOString() || null,
+    };
   }
 }

@@ -3,18 +3,19 @@ import { UserDTO } from './dto/model/user.dto';
 import { UserService } from './user.service';
 import { UpsertUserInput } from './dto/user.upsert.dto';
 import { ChangePasswordInput, ChangePasswordResponse } from './dto/user.change-password.dto';
-import { Roles } from 'src/roles.decorator';
-import { Role, User } from '@prisma/client';
+import { User } from '@prisma/client';
+import { ChangeRoleInput } from './dto/change-role.dto';
+import { GetInactiveUsersInput } from './dto/get-inactive-users.dto';
 
 @Resolver(() => UserDTO)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Query(() => String)
-  @Roles(Role.ADMIN)
-  securedResourceforAdmin(@Context('user') user: UserDTO) {
-    return 'This is Secured Resource' + JSON.stringify(user);
-  }
+  // @Query(() => String)
+  // @Roles(Role.ADMIN)
+  // securedResourceforAdmin(@Context('user') user: UserDTO) {
+  //   return 'This is Secured Resource' + JSON.stringify(user);
+  // }
 
   @Mutation(() => ChangePasswordResponse)
   async changePassword(
@@ -54,9 +55,29 @@ export class UserResolver {
     return this.userService.getUsersByDateRange(fromDate, toDate, page, limit);
   }
 
+  @Query(() => [UserDTO])
+  async getInactiveUsers(@Args('input') input: GetInactiveUsersInput) {
+    return this.userService.getInactiveUsers(input);
+  }
+
+  @Query(() => [UserDTO])
+  async getSharedProfiles(@Args('userId', { type: () => Int }) userId: number) {
+    return this.userService.getSharedProfiles(userId);
+  }
+
+  @Query(() => [UserDTO])
+  async getSharingProfiles(@Args('userId', { type: () => Int }) userId: number) {
+    return this.userService.getSharingProfiles(userId);
+  }
+
   @Mutation(() => String)
   deleteUserById(@Args({ name: 'userId', type: () => Int }) id: number) {
     return this.userService.deleteUser(id);
+  }
+
+  @Mutation(() => String)
+  async changeRole(@Args('input') input: ChangeRoleInput): Promise<string> {
+    return this.userService.changeRole(input);
   }
 
   // @Query(() => String)

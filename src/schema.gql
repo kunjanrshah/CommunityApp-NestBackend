@@ -133,9 +133,16 @@ type GetMastersResponseDTO {
   last_updated: Int!
 }
 
-type CityDTO {
+type CityDto {
   id: Int!
   name: String!
+  count: Int!
+}
+
+type CityResponseDto {
+  data: [CityDto!]
+  deleted: [Int!]
+  last_updated: String
 }
 
 type SearchResult {
@@ -144,9 +151,11 @@ type SearchResult {
 }
 
 type Query {
-  securedResourceforAdmin: String!
   getFamilyMembers(head_id: Float!): [UserDTO!]!
   usersByDateRange(fromDate: String!, toDate: String!, page: Float!, limit: Float!): [UserDTO!]!
+  getInactiveUsers(input: GetInactiveUsersInput!): [UserDTO!]!
+  getSharedProfiles(userId: Int!): [UserDTO!]!
+  getSharingProfiles(userId: Int!): [UserDTO!]!
   getCities(date: String): GetMastersResponseDTO!
   getStates(date: String): GetMastersResponseDTO!
   getBusinessCategories(date: String): GetMastersResponseDTO!
@@ -155,11 +164,18 @@ type Query {
   getRelations(date: String): GetMastersResponseDTO!
   getGotras(date: String): GetMastersResponseDTO!
   getSubCasts(date: String): GetMastersResponseDTO!
-  getCitiesByState(stateId: Int!): [CityDTO!]!
+  getCitiesByState(stateId: Int!, date: String, subCommunityId: Int): CityResponseDto!
   smartSearch(input: SearchInput!): SearchResult!
   smartFilter(input: SearchRequestDTO!): SearchResult!
   nearByUsers(filter: GetNearbyUsersInput!): SearchResult!
   isAppVersionExists(version: Float!): Boolean!
+}
+
+input GetInactiveUsersInput {
+  start: Int
+  limit: Int
+  subCommunityId: Int
+  localCommunityId: Int
 }
 
 input SearchInput {
@@ -237,6 +253,7 @@ type Mutation {
   upsertUser(upsertUserInput: UpsertUserInput!): UserDTO!
   updateLastLogin(user_id: Int!): Boolean!
   deleteUserById(userId: Int!): String!
+  changeRole(input: ChangeRoleInput!): String!
   register(RegisterInput: RegisterInput!): AuthResponse!
   login(LoginInput: LoginInput!): AuthResponse!
   refreshToken(token: String!): AuthResponse!
@@ -311,6 +328,13 @@ input UpsertUserInput {
   is_shani: Boolean! = false
   facebook_profile: String
   expectation: String
+}
+
+input ChangeRoleInput {
+  idList: [Float!]!
+  role: String!
+  subCommunityId: Float
+  localCommunityId: Float
 }
 
 input RegisterInput {
