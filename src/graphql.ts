@@ -25,6 +25,10 @@ export interface GetInactiveUsersInput {
     localCommunityId?: Nullable<number>;
 }
 
+export interface GetContactListInput {
+    mobiles: string[];
+}
+
 export interface StatisticsInputDto {
     cityId?: Nullable<number>;
     subCommunityId?: Nullable<number>;
@@ -40,10 +44,13 @@ export interface SearchInput {
 export interface SearchRequestDTO {
     start: number;
     length: number;
+    orderBy?: Nullable<string>;
+    orderByVal?: Nullable<string>;
     filter_by?: Nullable<SmartFilterDto>;
 }
 
 export interface SmartFilterDto {
+    id?: Nullable<number>;
     last_name_id?: Nullable<number>;
     local_community_id?: Nullable<number>;
     sub_community_id?: Nullable<number>;
@@ -89,6 +96,11 @@ export interface SmartFilterDto {
     matrimony?: Nullable<boolean>;
     is_shani?: Nullable<boolean>;
     is_mangal?: Nullable<boolean>;
+    str_search?: Nullable<string>;
+    committee_id?: Nullable<number>;
+    designation_id?: Nullable<number>;
+    start_date?: Nullable<string>;
+    end_date?: Nullable<string>;
 }
 
 export interface GetNearbyUsersInput {
@@ -175,6 +187,30 @@ export interface ChangeRoleInput {
     role: string;
     subCommunityId?: Nullable<number>;
     localCommunityId?: Nullable<number>;
+}
+
+export interface StatusChangeInputDto {
+    idList: string;
+    status: number;
+    extra_info?: Nullable<number>;
+    password?: Nullable<string>;
+    relation_id?: Nullable<number>;
+    head_id?: Nullable<number>;
+}
+
+export interface CreateReminderInput {
+    user_id: number;
+    rem_date: DateTime;
+    rem_type: string;
+    message: string;
+}
+
+export interface UpdateReminderInput {
+    user_id?: Nullable<number>;
+    rem_date?: Nullable<DateTime>;
+    rem_type?: Nullable<string>;
+    message?: Nullable<string>;
+    id: number;
 }
 
 export interface RegisterInput {
@@ -308,6 +344,17 @@ export interface ChangePasswordResponse {
     message: string;
 }
 
+export interface StatusChangeResponseDto {
+    success: boolean;
+    message: string;
+}
+
+export interface GetContactListResponse {
+    success: boolean;
+    message: string;
+    members?: Nullable<UserDTO[]>;
+}
+
 export interface MasterDTO {
     id: string;
     name: string;
@@ -354,22 +401,43 @@ export interface SearchResult {
     members: UserDTO[];
 }
 
+export interface Reminder {
+    id: number;
+    user_id: number;
+    rem_date: DateTime;
+    rem_type: string;
+    message: string;
+}
+
+export interface UploadModel {
+    id: number;
+    user_id: number;
+    file_name: string;
+    file_path: string;
+    updated: DateTime;
+}
+
 export interface IQuery {
     getFamilyMembers(head_id: number): UserDTO[] | Promise<UserDTO[]>;
     usersByDateRange(fromDate: string, toDate: string, page: number, limit: number): UserDTO[] | Promise<UserDTO[]>;
     getInactiveUsers(input: GetInactiveUsersInput): UserDTO[] | Promise<UserDTO[]>;
     getSharedProfiles(userId: number): UserDTO[] | Promise<UserDTO[]>;
     getSharingProfiles(userId: number): UserDTO[] | Promise<UserDTO[]>;
+    getContactList(input: GetContactListInput): GetContactListResponse | Promise<GetContactListResponse>;
     getCities(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getStates(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getBusinessCategories(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getCommittees(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+    getDesignations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getEducations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getRelations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getGotras(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getSubCasts(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
     getCitiesByState(stateId: number, date?: Nullable<string>, subCommunityId?: Nullable<number>): CityResponseDto | Promise<CityResponseDto>;
     getStatistics(input: StatisticsInputDto): StatisticsResponseDto | Promise<StatisticsResponseDto>;
+    reminders(): Reminder[] | Promise<Reminder[]>;
+    reminder(id: number): Reminder | Promise<Reminder>;
+    getUserFiles(user_id: number): UploadModel[] | Promise<UploadModel[]>;
     smartSearch(input: SearchInput): SearchResult | Promise<SearchResult>;
     smartFilter(input: SearchRequestDTO): SearchResult | Promise<SearchResult>;
     nearByUsers(filter: GetNearbyUsersInput): SearchResult | Promise<SearchResult>;
@@ -377,17 +445,26 @@ export interface IQuery {
 }
 
 export interface IMutation {
+    sendNotification(userId: number, title: string, message: string): string | Promise<string>;
     changePassword(ChangePasswordInput: ChangePasswordInput): ChangePasswordResponse | Promise<ChangePasswordResponse>;
     upsertUser(upsertUserInput: UpsertUserInput): UserDTO | Promise<UserDTO>;
     updateLastLogin(user_id: number): boolean | Promise<boolean>;
     deleteUserById(userId: number): string | Promise<string>;
     changeRole(input: ChangeRoleInput): string | Promise<string>;
+    statusChange(data: StatusChangeInputDto): StatusChangeResponseDto | Promise<StatusChangeResponseDto>;
+    createReminder(input: CreateReminderInput): Reminder | Promise<Reminder>;
+    updateReminder(input: UpdateReminderInput): Reminder | Promise<Reminder>;
+    removeReminder(id: number): Reminder | Promise<Reminder>;
+    uploadFile(file: Upload, user_id: number): UploadModel | Promise<UploadModel>;
+    deleteUserFile(id: number, user_id: number): UploadModel | Promise<UploadModel>;
     register(RegisterInput: RegisterInput): AuthResponse | Promise<AuthResponse>;
     login(LoginInput: LoginInput): AuthResponse | Promise<AuthResponse>;
     refreshToken(token: string): AuthResponse | Promise<AuthResponse>;
+    updateDeviceToken(): boolean | Promise<boolean>;
     forgotPassword(forgotPasswordInput: ForgotPasswordInput): string | Promise<string>;
     resetPassword(resetPasswordInput: ResetPasswordInput): string | Promise<string>;
 }
 
 export type DateTime = any;
+export type Upload = any;
 type Nullable<T> = T | null;

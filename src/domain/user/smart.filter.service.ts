@@ -13,7 +13,14 @@ export class SmartFilterService {
     const where: Prisma.UserWhereInput = {};
 
     if (filter_by) {
+      where.status = true; // Active users only
+
       // User Table Filters
+
+      if (filter_by.id) {
+        where.id = { equals: filter_by.id };
+      }
+
       if (filter_by.head_name) {
         where.first_name = { contains: filter_by.head_name, mode: 'insensitive' };
         where.head_id = 0;
@@ -24,6 +31,7 @@ export class SmartFilterService {
       }
       if (filter_by.first_name) {
         where.first_name = { contains: filter_by.first_name, mode: 'insensitive' };
+        where.head_id = { not: 0 };
       }
       if (filter_by.father_name) {
         where.father_name = { contains: filter_by.father_name, mode: 'insensitive' };
@@ -87,7 +95,7 @@ export class SmartFilterService {
         };
       }
 
-      // User Address Filters
+      //  User Address Filtering
       where.userAddress = {
         is: {
           ...(filter_by.address && {
@@ -105,7 +113,7 @@ export class SmartFilterService {
         },
       };
 
-      // Work Details Filters
+      // 🔹 Work Details Filtering (Business & Committee Details)
       where.userWorkDetail = {
         is: {
           ...(filter_by.business_address && {
@@ -114,6 +122,22 @@ export class SmartFilterService {
           ...(filter_by.business_category_id && {
             business_category_id: filter_by.business_category_id,
           }),
+
+          // 🔹 Filter by Committee
+          ...(filter_by.committee_id && { committee: { id: filter_by.committee_id } }),
+
+          // 🔹 Filter by Designation
+          ...(filter_by.designation_id && { designation: { id: filter_by.designation_id } }),
+
+          // 🔹 Filter by Start Date & End Date
+          ...(filter_by.start_date || filter_by.end_date
+            ? {
+                updated: {
+                  gte: filter_by.start_date ? new Date(filter_by.start_date + '-01') : undefined,
+                  lte: filter_by.end_date ? new Date(filter_by.end_date + '-28') : undefined,
+                },
+              }
+            : {}),
         },
       };
 

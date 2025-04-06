@@ -56,3 +56,5 @@ prisma/migrations
 src/graphql.ts
 src/schema.gql
 
+/firebase-service-account.json
+/public/

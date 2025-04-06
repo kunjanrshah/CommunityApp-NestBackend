@@ -69,6 +69,9 @@ model User {
   localCommunity     LocalCommunity?     @relation(fields: [local_community_id], references: [id])
   subCommunity       SubCommunity?       @relation(fields: [sub_community_id], references: [id])
   userLocations      UserLocation[]
+  tkn_devices        tkn_devices[]
+  reminders          Reminder[]
+  uploads            Uploads[]
 }
 
 model UserAddress {
@@ -259,6 +262,36 @@ model UserLocation {
   longitude          Float
   sharing_id         String
   is_location_enable Boolean @default(false)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Reminder{
+  id                 Int     @id @default(autoincrement()) // Unique identifier
+  user_id            Int
+  rem_date           DateTime
+  rem_type           String
+  message            String
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Uploads{
+  id                 Int     @id @default(autoincrement()) // Unique identifier
+  user_id            Int
+  file_name          String
+  file_path          String
+  updated           DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model tkn_devices {
+  id           Int      @id @default(autoincrement()) // Unique identifier
+  user_id      Int
+  types  Int // 1 Android 0 iPhone
+  tokens String
+  updated      DateTime @updatedAt
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

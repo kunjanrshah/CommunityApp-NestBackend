@@ -4,6 +4,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { ChangeRoleInput } from './dto/change-role.dto';
 import { GetInactiveUsersInput } from './dto/get-inactive-users.dto';
+import { GetContactListInput } from './dto/get-contact-list.input';
+import { GetContactListResponse } from './dto/model/get-contact-list.response';
 
 @Injectable()
 export class UserService {
@@ -436,6 +438,31 @@ export class UserService {
     return this.prisma.user.findMany({
       where: { id: { in: sharingUserIds } },
     });
+  }
+
+  async getContactList(input: GetContactListInput): Promise<GetContactListResponse> {
+    const { mobiles } = input;
+
+    const users = await this.prisma.user.findMany({
+      where: {
+        mobile: { in: mobiles },
+        status: { not: false },
+      },
+    });
+
+    if (users.length > 0) {
+      return {
+        success: true,
+        message: 'Data Retrieved Successfully',
+        members: users, // Returns full user records
+      };
+    } else {
+      return {
+        success: false,
+        message: 'No Data Found',
+        members: [],
+      };
+    }
   }
 
   // async findUserById(id: number) {

@@ -34,9 +34,20 @@ importers:
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
+
+      firebase-admin:
+        specifier: ^13.2.0
+        version: 13.2.0
+      fs-capacitor:
+        specifier: ^8.0.0
+        version: 8.0.0
+
       geolib:
         specifier: ^3.3.4
         version: 3.3.4
+      graphql-upload:
+        specifier: ^13.0.0
+        version: 13.0.0(graphql@16.10.0)
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -3022,6 +3033,13 @@ packages:
       }
     engines: { node: ">=6" }
 
+  busboy@0.3.1:
+    resolution:
+      {
+        integrity: sha512-y7tTxhGKXcyBxRKAni+awqx8uqaJKrSFSNFSeRG5CsWNdmy2BIK+6VGWEW7TZnIO/533mtMEA4rOevQV815YJw==,
+      }
+    engines: { node: ">=4.5.0" }
+
   busboy@1.6.0:
     resolution:
       {
@@ -3895,6 +3913,13 @@ packages:
       }
     engines: { node: ">=0.4.0" }
 
+  depd@1.1.2:
+    resolution:
+      {
+        integrity: sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==,
+      }
+    engines: { node: ">= 0.6" }
+
   depd@2.0.0:
     resolution:
       {
@@ -3948,6 +3973,13 @@ packages:
       {
         integrity: sha512-8wn1PmdunLJ9Tqbx+Fx/ZEuHfJf4NKSN2ZBj7SJC/OWRWha843+WsTjqMe1B5E3p28jqBlp+mJ2fPVxPyNgYKQ==,
       }
+
+  dicer@0.3.0:
+    resolution:
+      {
+        integrity: sha512-MdceRRWqltEG2dZqO769g27N/3PXfcKl04VhYnBlo2YhH7zPi88VebsjTKclaOyiuMaGU72hTfw3VkUitGcVCA==,
+      }
+    engines: { node: ">=4.5.0" }
 
   diff-sequences@29.6.3:
     resolution:
@@ -4795,6 +4827,20 @@ packages:
       }
     engines: { node: ">= 0.6" }
 
+  fs-capacitor@6.2.0:
+    resolution:
+      {
+        integrity: sha512-nKcE1UduoSKX27NSZlg879LdQc94OtbOsEmKMN2MBNudXREvijRKx2GEBsTMTfws+BrbkJoEuynbGSVRSpauvw==,
+      }
+    engines: { node: ">=10" }
+
+  fs-capacitor@8.0.0:
+    resolution:
+      {
+        integrity: sha512-+Lk6iSKajdGw+7XYxUkwIzreJ2G1JFlYOdnKJv5PzwFLVsoJYBpCuS7WPIUSNT1IbQaEWT1nhYU63Ud03DyzLA==,
+      }
+    engines: { node: ^14.17.0 || >=16.0.0 }
+
   fs-extra@10.1.0:
     resolution:
       {
@@ -5056,6 +5102,15 @@ packages:
     peerDependencies:
       graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
 
+  graphql-upload@13.0.0:
+    resolution:
+      {
+        integrity: sha512-YKhx8m/uOtKu4Y1UzBFJhbBGJTlk7k4CydlUUiNrtxnwZv0WigbRHP+DVhRNKt7u7DXOtcKZeYJlGtnMXvreXA==,
+      }
+    engines: { node: ^12.22.0 || ^14.17.0 || >= 16.0.0 }
+    peerDependencies:
+      graphql: 0.13.1 - 16
+
   graphql-ws@5.16.0:
     resolution:
       {
@@ -5208,6 +5263,13 @@ packages:
       {
         integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==,
       }
+
+  http-errors@1.8.1:
+    resolution:
+      {
+        integrity: sha512-Kpk9Sm7NmI+RHhnj6OIWDI1d6fIoFAtFt9RLaTMRlg/8w49juAStsrBgp0Dp4OdxdVbRIeKhtCUvoi/RuAhO4g==,
+      }
+    engines: { node: ">= 0.6" }
 
   http-errors@2.0.0:
     resolution:
@@ -7000,6 +7062,13 @@ packages:
       }
     engines: { node: ">= 0.4" }
 
+  object-path@0.11.8:
+    resolution:
+      {
+        integrity: sha512-YJjNZrlXJFM42wTBn6zgOJVar9KFJvzx6sTWDte8sWZF//cnjl0BxHNpfZx+ZffXX63A9q0b1zsFiBX4g4X5KA==,
+      }
+    engines: { node: ">= 10.12.0" }
+
   object-visit@1.0.1:
     resolution:
       {
@@ -8325,12 +8394,38 @@ packages:
       }
     engines: { node: ">=0.10.0" }
 
+  statuses@1.5.0:
+    resolution:
+      {
+        integrity: sha512-OpZ3zP+jT1PI7I8nemJX4AKmAX070ZkYPVWV/AaKTJl+tXCTGyVdC1a4SL8RUQYEwk/f34ZX8UTykN68FwrqAA==,
+      }
+    engines: { node: ">= 0.6" }
+
   statuses@2.0.1:
     resolution:
       {
         integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==,
       }
     engines: { node: ">= 0.8" }
+
+  stream-events@1.0.5:
+    resolution:
+      {
+        integrity: sha512-E1GUzBSgvct8Jsb3v2X15pjzN1tYebtbLaMg+eBOUOAxgbLoSbT2NS91ckc5lJD1KfLjId+jXJRgo0qnV5Nerg==,
+      }
+
+  stream-shift@1.0.3:
+    resolution:
+      {
+        integrity: sha512-76ORR0DO1o1hlKwTbi/DM3EXWGf3ZJYO8cXX5RJwnul2DEg2oyoZyjLNoQM8WsvZiFKCRfC1O0J7iCvie3RZmQ==,
+      }
+
+  streamsearch@0.1.2:
+    resolution:
+      {
+        integrity: sha512-jos8u++JKm0ARcSUTAZXOVC0mSox7Bhn6sBgty73P1f3JGf7yG2clTbBNHUdde/kdvP2FESam+vM6l8jBrNxHA==,
+      }
+    engines: { node: ">=0.8.0" }
 
   streamsearch@1.1.0:
     resolution:
@@ -11511,6 +11606,10 @@ snapshots:
 
   builtin-modules@3.3.0: {}
 
+  busboy@0.3.1:
+    dependencies:
+      dicer: 0.3.0
+
   busboy@1.6.0:
     dependencies:
       streamsearch: 1.1.0
@@ -12057,6 +12156,8 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
+  depd@1.1.2: {}
+
   depd@2.0.0: {}
 
   destroy@1.2.0: {}
@@ -12079,6 +12180,10 @@ snapshots:
       colorspace: 1.1.4
       enabled: 1.0.2
       kuler: 1.0.1
+
+  dicer@0.3.0:
+    dependencies:
+      streamsearch: 0.1.2
 
   diff-sequences@29.6.3: {}
 
@@ -12772,6 +12877,10 @@ snapshots:
 
   fresh@0.5.2: {}
 
+  fs-capacitor@6.2.0: {}
+
+  fs-capacitor@8.0.0: {}
+
   fs-extra@10.1.0:
     dependencies:
       graceful-fs: 4.2.11
@@ -12945,6 +13054,14 @@ snapshots:
       graphql: 16.10.0
       tslib: 2.8.1
 
+  graphql-upload@13.0.0(graphql@16.10.0):
+    dependencies:
+      busboy: 0.3.1
+      fs-capacitor: 6.2.0
+      graphql: 16.10.0
+      http-errors: 1.8.1
+      object-path: 0.11.8
+
   graphql-ws@5.16.0(graphql@16.10.0):
     dependencies:
       graphql: 16.10.0
@@ -13015,6 +13132,14 @@ snapshots:
       lru-cache: 6.0.0
 
   html-escaper@2.0.2: {}
+
+  http-errors@1.8.1:
+    dependencies:
+      depd: 1.1.2
+      inherits: 2.0.4
+      setprototypeof: 1.2.0
+      statuses: 1.5.0
+      toidentifier: 1.0.1
 
   http-errors@2.0.0:
     dependencies:
@@ -14226,6 +14351,8 @@ snapshots:
 
   object-keys@1.1.1: {}
 
+  object-path@0.11.8: {}
+
   object-visit@1.0.1:
     dependencies:
       isobject: 3.0.1
@@ -14984,7 +15111,19 @@ snapshots:
       define-property: 0.2.5
       object-copy: 0.1.0
 
+  statuses@1.5.0: {}
+
   statuses@2.0.1: {}
+
+  stream-events@1.0.5:
+    dependencies:
+      stubs: 3.0.0
+    optional: true
+
+  stream-shift@1.0.3:
+    optional: true
+
+  streamsearch@0.1.2: {}
 
   streamsearch@1.1.0: {}
 

@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query, Context } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { LoginInput } from 'src/auth/dto/login.input';
 import { AuthResponse, RegisterInput } from 'src/auth/dto/register.input';
@@ -34,6 +34,19 @@ export class AuthResolver {
   @Mutation(() => AuthResponse)
   async refreshToken(@Args('token') token: string) {
     return this.authService.refreshToken(token);
+  }
+
+  @Mutation(() => Boolean)
+  async updateDeviceToken(@Context() context): Promise<boolean> {
+    const userId = context.req.user.userId; // Get user ID from authenticated request
+    const deviceToken = context.req['deviceToken']; // Extract from request
+    console.log('deviceToken: ', deviceToken);
+    console.log('userId: ', userId);
+    if (!userId || !deviceToken) {
+      throw new Error('User ID or Device Token is missing');
+    }
+
+    return this.authService.updateDeviceToken(userId, deviceToken);
   }
 
   @Public()

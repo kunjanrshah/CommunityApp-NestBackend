@@ -120,6 +120,17 @@ type ChangePasswordResponse {
   message: String!
 }
 
+type StatusChangeResponseDto {
+  success: Boolean!
+  message: String!
+}
+
+type GetContactListResponse {
+  success: Boolean!
+  message: String!
+  members: [UserDTO!]
+}
+
 type MasterDTO {
   id: String!
   name: String!
@@ -166,22 +177,43 @@ type SearchResult {
   members: [UserDTO!]!
 }
 
+type Reminder {
+  id: Int!
+  user_id: Int!
+  rem_date: DateTime!
+  rem_type: String!
+  message: String!
+}
+
+type UploadModel {
+  id: Int!
+  user_id: Int!
+  file_name: String!
+  file_path: String!
+  updated: DateTime!
+}
+
 type Query {
   getFamilyMembers(head_id: Float!): [UserDTO!]!
   usersByDateRange(fromDate: String!, toDate: String!, page: Float!, limit: Float!): [UserDTO!]!
   getInactiveUsers(input: GetInactiveUsersInput!): [UserDTO!]!
   getSharedProfiles(userId: Int!): [UserDTO!]!
   getSharingProfiles(userId: Int!): [UserDTO!]!
+  getContactList(input: GetContactListInput!): GetContactListResponse!
   getCities(date: String): GetMastersResponseDTO!
   getStates(date: String): GetMastersResponseDTO!
   getBusinessCategories(date: String): GetMastersResponseDTO!
   getCommittees(date: String): GetMastersResponseDTO!
+  getDesignations(date: String): GetMastersResponseDTO!
   getEducations(date: String): GetMastersResponseDTO!
   getRelations(date: String): GetMastersResponseDTO!
   getGotras(date: String): GetMastersResponseDTO!
   getSubCasts(date: String): GetMastersResponseDTO!
   getCitiesByState(stateId: Int!, date: String, subCommunityId: Int): CityResponseDto!
   getStatistics(input: StatisticsInputDto!): StatisticsResponseDto!
+  reminders: [Reminder!]!
+  reminder(id: Int!): Reminder!
+  getUserFiles(user_id: Int!): [UploadModel!]!
   smartSearch(input: SearchInput!): SearchResult!
   smartFilter(input: SearchRequestDTO!): SearchResult!
   nearByUsers(filter: GetNearbyUsersInput!): SearchResult!
@@ -193,6 +225,10 @@ input GetInactiveUsersInput {
   limit: Int
   subCommunityId: Int
   localCommunityId: Int
+}
+
+input GetContactListInput {
+  mobiles: [String!]!
 }
 
 input StatisticsInputDto {
@@ -210,10 +246,13 @@ input SearchInput {
 input SearchRequestDTO {
   start: Int! = 0
   length: Int! = 10
+  orderBy: String
+  orderByVal: String
   filter_by: SmartFilterDto
 }
 
 input SmartFilterDto {
+  id: Int
   last_name_id: Int
   local_community_id: Int
   sub_community_id: Int
@@ -259,6 +298,11 @@ input SmartFilterDto {
   matrimony: Boolean
   is_shani: Boolean
   is_mangal: Boolean
+  str_search: String
+  committee_id: Int
+  designation_id: Int
+  start_date: String
+  end_date: String
 }
 
 input GetNearbyUsersInput {
@@ -272,14 +316,22 @@ input GetNearbyUsersInput {
 }
 
 type Mutation {
+  sendNotification(userId: Float!, title: String!, message: String!): String!
   changePassword(ChangePasswordInput: ChangePasswordInput!): ChangePasswordResponse!
   upsertUser(upsertUserInput: UpsertUserInput!): UserDTO!
   updateLastLogin(user_id: Int!): Boolean!
   deleteUserById(userId: Int!): String!
   changeRole(input: ChangeRoleInput!): String!
+  statusChange(data: StatusChangeInputDto!): StatusChangeResponseDto!
+  createReminder(input: CreateReminderInput!): Reminder!
+  updateReminder(input: UpdateReminderInput!): Reminder!
+  removeReminder(id: Int!): Reminder!
+  uploadFile(file: Upload!, user_id: Int!): UploadModel!
+  deleteUserFile(id: Int!, user_id: Int!): UploadModel!
   register(RegisterInput: RegisterInput!): AuthResponse!
   login(LoginInput: LoginInput!): AuthResponse!
   refreshToken(token: String!): AuthResponse!
+  updateDeviceToken: Boolean!
   forgotPassword(forgotPasswordInput: ForgotPasswordInput!): String!
   resetPassword(resetPasswordInput: ResetPasswordInput!): String!
 }
@@ -359,6 +411,33 @@ input ChangeRoleInput {
   subCommunityId: Float
   localCommunityId: Float
 }
+
+input StatusChangeInputDto {
+  idList: String!
+  status: Int!
+  extra_info: Int
+  password: String
+  relation_id: Int
+  head_id: Int
+}
+
+input CreateReminderInput {
+  user_id: Float!
+  rem_date: DateTime!
+  rem_type: String!
+  message: String!
+}
+
+input UpdateReminderInput {
+  user_id: Float
+  rem_date: DateTime
+  rem_type: String
+  message: String
+  id: Int!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input RegisterInput {
   first_name: String!

@@ -6,10 +6,18 @@ import { ChangePasswordInput, ChangePasswordResponse } from './dto/user.change-p
 import { User } from '@prisma/client';
 import { ChangeRoleInput } from './dto/change-role.dto';
 import { GetInactiveUsersInput } from './dto/get-inactive-users.dto';
+import { StatusChangeInputDto } from './dto/status-change-input.dto';
+import { StatusChangeResponseDto } from './dto/model/status-change-response.dto';
+import { StatusChangeService } from './status-change.service';
+import { GetContactListResponse } from './dto/model/get-contact-list.response';
+import { GetContactListInput } from './dto/get-contact-list.input';
 
 @Resolver(() => UserDTO)
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly statusChangeService: StatusChangeService,
+  ) {}
 
   // @Query(() => String)
   // @Roles(Role.ADMIN)
@@ -78,6 +86,16 @@ export class UserResolver {
   @Mutation(() => String)
   async changeRole(@Args('input') input: ChangeRoleInput): Promise<string> {
     return this.userService.changeRole(input);
+  }
+
+  @Mutation(() => StatusChangeResponseDto)
+  async statusChange(@Args('data') data: StatusChangeInputDto): Promise<StatusChangeResponseDto> {
+    return this.statusChangeService.statusChange(data);
+  }
+
+  @Query(() => GetContactListResponse)
+  async getContactList(@Args('input') input: GetContactListInput): Promise<GetContactListResponse> {
+    return this.userService.getContactList(input);
   }
 
   // @Query(() => String)

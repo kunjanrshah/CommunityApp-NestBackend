@@ -5,9 +5,11 @@ import { GqlAuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { MastersModule } from './masters/masters.module';
 import { AppSearchModule } from './user/appsearch.module';
+import { ReminderModule } from './reminder/reminder.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
-  imports: [UserModule, MastersModule, AppSearchModule],
+  imports: [UserModule, MastersModule, ReminderModule, UploadsModule, AppSearchModule],
   controllers: [],
   providers: [
     {
@@ -19,6 +21,5 @@ import { AppSearchModule } from './user/appsearch.module';
       useClass: RolesGuard, // ✅ Then, apply role-based authorization globally
     },
   ],
-  exports: [],
 })
 export class DomainModule {}

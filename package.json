@@ -38,7 +38,12 @@
     "@nestjs/platform-express": "^10.0.0",
     "class-transformer": "^0.5.1",
     "cookie-parser": "^1.4.7",
+
+    "firebase-admin": "^13.2.0",
+    "fs-capacitor": "^8.0.0",
+
     "geolib": "^3.3.4",
+    "graphql-upload": "^13.0.0",
     "jsonwebtoken": "^9.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

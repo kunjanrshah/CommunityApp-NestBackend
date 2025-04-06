@@ -42,13 +42,13 @@ export class MastersResolver {
     return this.mastersService.getRecords('committee', date);
   }
 
-  // TODO: NO NEED
-  // @Query(() => GetMastersResponseDTO)
-  // async getDesignations(
-  //   @Args('date', { nullable: true }) date?: string,
-  // ): Promise<GetMastersResponseDTO> {
-  //   return this.mastersService.getRecords('designation', date);
-  // }
+  // NEED FOR COMMITTEEE
+  @Query(() => GetMastersResponseDTO)
+  async getDesignations(
+    @Args('date', { nullable: true }) date?: string,
+  ): Promise<GetMastersResponseDTO> {
+    return this.mastersService.getRecords('designation', date);
+  }
 
   // TODO: NO NEED
   // @Query(() => GetMastersResponseDTO)

@@ -9,6 +9,12 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { RegisterInput } from 'src/auth/dto/register.input';
+import { Role } from '@prisma/client';
+
+interface Notification {
+  user_id: number;
+  message: string;
+}
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthService {
@@ -48,12 +54,81 @@ export class AuthService {
         await tx.userAddress.create({
           data: userAddressData,
         });
+
+        const subcaste = await tx.subCast.findFirst({
+          where: { id: user.last_name_id },
+          select: { name: true },
+        });
+
+        this.sendNotification(
+          user.id,
+          user.first_name,
+          subcaste.name,
+          user.local_community_id,
+          user.sub_community_id,
+        );
+
         return this.generateTokens(user.id, user.mobile, user.role);
       });
       return result;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private async sendNotification(
+    userId: number,
+    firstName: string,
+    lastName: string,
+    localCommunityId: number,
+    subCommunityId: number,
+  ) {
+    let adminTokens = await this.getAdminTokens(localCommunityId, Role.ADMIN);
+
+    if (adminTokens.length === 0) {
+      adminTokens = await this.getAdminTokens(subCommunityId, Role.ADMIN);
+    }
+
+    if (adminTokens.length > 0) {
+      const textMsg = `Please approve ${firstName} ${lastName}'s Request`;
+      const notify = {
+        user_id: userId,
+        message: textMsg,
+      };
+
+      await this.sendAndroidNotification(notify, adminTokens);
+    }
+  }
+
+  private async getAdminTokens(communityId: number | null, role: Role): Promise<string[]> {
+    const users = await this.prisma.user.findMany({
+      where: {
+        role,
+        ...(communityId
+          ? { OR: [{ local_community_id: communityId }, { sub_community_id: communityId }] }
+          : {}),
+      },
+      select: { id: true },
+    });
+
+    const userIds = users.map((user) => user.id);
+
+    if (userIds.length === 0) return [];
+
+    const deviceTokens = await this.prisma.tkn_devices.findMany({
+      where: { user_id: { in: userIds } },
+      select: { tokens: true },
+    });
+
+    return deviceTokens.map((device) => device.tokens).filter((token) => token.length > 10);
+  }
+
+  private async sendAndroidNotification(
+    notification: Notification,
+    tokens: string[],
+  ): Promise<void> {
+    // Implement the push notification logic here
+    console.log('Sending notification:', notification, 'to tokens:', tokens);
   }
 
   async validateUser(mobile: string, password: string) {
@@ -64,7 +139,6 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid mobile');
     }
-    console.log('kunjan: ', password, mobile);
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
@@ -105,5 +179,26 @@ export class AuthService {
   async checkVersionExists(version: number): Promise<boolean> {
     const versionExists = await this.prisma.appVersion.findFirst({ where: { version } });
     return !!versionExists;
+  }
+
+  async updateDeviceToken(userId: number, token: string): Promise<boolean> {
+    // Check if the device token already exists for the user
+    const existingDevice = await this.prisma.tkn_devices.findFirst({
+      where: { user_id: userId },
+    });
+
+    if (existingDevice) {
+      // Update the existing token
+      await this.prisma.tkn_devices.update({
+        where: { id: existingDevice.id },
+        data: { tokens: token },
+      });
+    } else {
+      // Create a new entry
+      await this.prisma.tkn_devices.create({
+        data: { user_id: userId, tokens: token, types: 1 },
+      });
+    }
+    return true;
   }
 }

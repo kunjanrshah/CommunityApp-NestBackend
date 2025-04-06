@@ -6,6 +6,11 @@ export class SmartFilterDto {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
+  id?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
   last_name_id?: number;
 
   @Field(() => Int, { nullable: true })
@@ -252,6 +257,26 @@ export class SmartFilterDto {
   @IsOptional()
   @IsBoolean()
   is_mangal?: boolean;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  str_search?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  committee_id?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  designation_id?: number;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  start_date?: string; // Format: YYYY-MM
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  end_date?: string; // Format: YYYY-MM
 }
 
 @InputType()
@@ -265,6 +290,14 @@ export class SearchRequestDTO {
   @IsInt()
   @Min(1)
   length: number;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  orderBy?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  orderByVal?: 'asc' | 'desc';
 
   @Field(() => SmartFilterDto, { nullable: true })
   @IsOptional()
