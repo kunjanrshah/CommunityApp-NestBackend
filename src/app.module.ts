@@ -39,17 +39,22 @@ import { FirebaseService } from './firebase/firebase.service';
       // },
       csrfPrevention: false,
       context: ({ req }) => ({ req }),
-      // formatError: (error) => {
-      //   return {
-      //     message: error.message,
-      //     extensions: {
-      //       code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
-      //       timestamp: new Date().toISOString(),
-      //       status: error.extensions?.status || 500,
-      //       path: 'GraphQL',
-      //     },
-      //   };
-      // },
+      formatError: (error) => {
+        // For HttpExceptions (like BadRequestException), return only the
+        // original error payload: { message, error, statusCode }
+        const originalError = error.extensions?.originalError;
+        if (originalError && typeof originalError === 'object') {
+          return originalError as Record<string, unknown>;
+        }
+
+        // Fallback for other errors (GraphQL validation, internal, etc.)
+        return {
+          message: error.message,
+          extensions: {
+            code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+          },
+        };
+      },
     }),
   ],
   controllers: [AppController],

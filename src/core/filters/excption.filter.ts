@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
   HttpStatus,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { GraphQLError } from 'graphql';
 
 @Catch()
@@ -30,7 +30,7 @@ export class GraphQLExceptionFilter implements ExceptionFilter {
           extensions: { code: 'UNAUTHENTICATED', status },
         });
       }
-    } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+    } else if (exception instanceof PrismaClientKnownRequestError) {
       // Handle Prisma-specific errors
       status = HttpStatus.BAD_REQUEST;
       message = this.handlePrismaError(exception);
@@ -53,7 +53,7 @@ export class GraphQLExceptionFilter implements ExceptionFilter {
     ctx.getResponse().status(status).json(errorResponse);
   }
 
-  private handlePrismaError(exception: Prisma.PrismaClientKnownRequestError): string {
+  private handlePrismaError(exception: PrismaClientKnownRequestError): string {
     switch (exception.code) {
       case 'P2002':
         return 'Unique constraint failed. Duplicate value exists.';

@@ -4,6 +4,7 @@ import { UserAddressDTO } from './user-address.dto';
 import { UserMatrimonyDTO } from './user-matrimony.dto';
 import { UserPersonalDetailDTO } from './user-personal-details.dto';
 import { UserWorkDetailDTO } from './user-work-details.dto';
+import { UserLocationDTO } from './user-location.dto';
 
 registerEnumType(Role, {
   name: 'Role', // GraphQL name
@@ -97,6 +98,9 @@ export class UserDTO {
 
   @Field(() => UserAddressDTO, { nullable: true }) // Include Address as part of the User response
   userAddress?: UserAddressDTO;
+
+  @Field(() => UserLocationDTO, { nullable: true }) // Include Address as part of the User response
+  userLocation?: UserLocationDTO;
 
   @Field(() => UserMatrimonyDTO, { nullable: true }) // Include Address as part of the User response
   userMatrimony?: UserMatrimonyDTO;

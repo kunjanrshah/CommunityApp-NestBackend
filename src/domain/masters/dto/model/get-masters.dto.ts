@@ -7,6 +7,12 @@ export class MasterDTO {
 
   @Field(() => String)
   name: string;
+
+  @Field(() => Int, { nullable: true })
+  states_id: number;
+
+  @Field(() => Int, { nullable: true })
+  sub_community_id: number;
 }
 
 @ObjectType()

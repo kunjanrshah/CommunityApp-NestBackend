@@ -15,22 +15,24 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-   # image: kunjan16/community-backend:dev
+    # image: kunjan16/community-backend:dev
     container_name: nestjs-app-dev
     ports:
       - "3000:3000"
+      - "9229:9229"   # Debug port for Node.js inspector
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: community_dev
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/community_dev?schema=public
     depends_on:
       - postgres
     volumes:
       - .:/usr/src/app   # Maps your host directory to the container
       - /usr/src/app/node_modules   # Avoid conflicts with node_modules
-    command: npm run start:dev
+    command: npm run start:debug
 
   pgadmin:
     image: dpage/pgadmin4

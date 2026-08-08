@@ -4,9 +4,11 @@ import {
   InternalServerErrorException,
   Scope,
   UnauthorizedException,
+  HttpException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as bcrypt from 'bcryptjs';
 import { RegisterInput } from 'src/auth/dto/register.input';
 import { Role } from '@prisma/client';
@@ -22,11 +24,18 @@ export class AuthService {
 
   async register(input: RegisterInput) {
     try {
-      const mobile = input.mobile;
-      const existingUser = await this.prisma.user.findFirst({ where: { mobile } });
-      if (existingUser) {
+      // Check mobile uniqueness
+      const existingMobile = await this.prisma.user.findFirst({ where: { mobile: input.mobile } });
+      if (existingMobile) {
         throw new BadRequestException('Mobile is already registered');
       }
+
+      // Check email uniqueness
+      const existingEmail = await this.prisma.user.findFirst({ where: { email: input.email } });
+      if (existingEmail) {
+        throw new BadRequestException('Email is already registered');
+      }
+
       const hashedPassword = await bcrypt.hash(input.password, 10);
 
       const result = await this.prisma.$transaction(async (tx) => {
@@ -41,6 +50,7 @@ export class AuthService {
             local_community_id: input.local_community_id,
             gender: input.gender,
             profile_pic: input.profile_pic,
+            status: input.status,
           },
         });
 
@@ -60,20 +70,89 @@ export class AuthService {
           select: { name: true },
         });
 
+        // Fire-and-forget notification (don't block registration)
         this.sendNotification(
           user.id,
           user.first_name,
-          subcaste.name,
+          subcaste?.name ?? '',
           user.local_community_id,
           user.sub_community_id,
-        );
+        ).catch((notifyError) => {
+          console.error('Notification failed (non-blocking):', notifyError);
+        });
 
         return this.generateTokens(user.id, user.mobile, user.role);
       });
       return result;
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      // If it's already an HTTP exception (like BadRequestException), re-throw it directly
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      // Handle Prisma known request errors (e.g., unique constraint violations)
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          const target = (error.meta?.target as string[]) ?? [];
+          if (target.includes('email')) {
+            throw new BadRequestException('Email is already registered');
+          }
+          if (target.includes('mobile')) {
+            throw new BadRequestException('Mobile is already registered');
+          }
+          throw new BadRequestException('A record with this value already exists');
+        }
+        throw new BadRequestException('Database error occurred during registration');
+      }
+
+      // Log the actual error for debugging
+      console.error('Registration error:', error);
+
+      // Only throw InternalServerErrorException for truly unknown errors
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === 'string'
+          ? error
+          : 'An unexpected error occurred during registration';
+      throw new InternalServerErrorException(message);
     }
+  }
+
+  async refreshToken(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      return this.generateTokens(decoded.id, decoded.mobile, decoded.role);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'string'
+          ? err
+          : 'An unexpected error occurred';
+      throw new UnauthorizedException('Invalid refresh token', message);
+    }
+  }
+
+  generateTokens(userId: number, mobile: string, role: string) {
+    const payload = { id: userId, mobile, role };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '35m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    return { accessToken, refreshToken, message: 'Success' };
+  }
+
+  async login(mobile: string, password: string) {
+    const user = await this.validateUser(mobile, password);
+
+    // Generate JWT Token
+    const payload = { id: user.id, mobile: user.mobile, role: user.role };
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      accessToken,
+      message: 'Login successful',
+    };
   }
 
   private async sendNotification(
@@ -147,35 +226,6 @@ export class AuthService {
     return user;
   }
 
-  generateTokens(userId: number, mobile: string, role: string) {
-    const payload = { id: userId, mobile, role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '35m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-    return { accessToken, refreshToken, message: 'Success' };
-  }
-
-  async login(mobile: string, password: string) {
-    const user = await this.validateUser(mobile, password);
-
-    // Generate JWT Token
-    const payload = { id: user.id, mobile: user.mobile, role: user.role };
-    const accessToken = this.jwtService.sign(payload);
-
-    return {
-      accessToken,
-      message: 'Login successful',
-    };
-  }
-
-  async refreshToken(token: string) {
-    try {
-      const decoded = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
-      return this.generateTokens(decoded.id, decoded.mobile, decoded.role);
-    } catch (err) {
-      throw new UnauthorizedException('Invalid refresh token', err.message);
-    }
-  }
   async checkVersionExists(version: number): Promise<boolean> {
     const versionExists = await this.prisma.appVersion.findFirst({ where: { version } });
     return !!versionExists;

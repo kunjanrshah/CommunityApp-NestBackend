@@ -22,6 +22,11 @@ async function bootstrap() {
   app.use(graphqlUploadExpress({ maxFileSize: 10_000_000, maxFiles: 5 }));
   // Serve files from /public
   app.useStaticAssets(join(__dirname, '..', 'public'));
+
+  // app.enableCors({
+  //   origin: '*', // or specify IP-based origin like "http://192.168.1.50"
+  // });
+
   await app.listen(3000);
 }
 bootstrap();

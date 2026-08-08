@@ -84,25 +84,34 @@ export class MastersCountService {
     try {
       console.log('filterDateIST: ' + date);
 
-      let filterDate = date ? new Date(date) : new Date(0); // Default to fetch all if no date is given
+      let filterDate = date ? new Date(date) : new Date(0);
 
-      // Ensure valid date object is created
       if (isNaN(filterDate.getTime())) {
         throw new Error('Invalid date format');
       }
 
-      // ✅ Convert to IST (Indian Standard Time UTC+5:30)
       const filterDateIST = new Date(filterDate.getTime() + 5.5 * 60 * 60 * 1000);
 
-      // ✅ Fetch Active Records Updated After the Given Date
+      // Define default select fields
+      let selectFields: Record<string, boolean> = { id: true, name: true };
+
+      // Adjust select fields based on table name
+      if (tableName === 'city') {
+        selectFields.states_id = true;
+      } else if (tableName === 'localCommunity') {
+        selectFields.sub_community_id = true;
+      }
+
+      // Fetch active records
       const activeRecords = await this.prisma[tableName].findMany({
         where: {
           deleted: false,
           updated: { gt: filterDateIST },
         },
-        select: { id: true, name: true },
+        select: selectFields,
       });
-      // Fetch deleted records (deleted = true) and updated after the given date
+
+      // Fetch deleted records
       const deletedRecords = await this.prisma[tableName].findMany({
         where: {
           deleted: true,
@@ -111,7 +120,6 @@ export class MastersCountService {
         select: { id: true },
       });
 
-      // Get the latest updated timestamp
       const lastUpdatedRecord = await this.prisma[tableName].findFirst({
         orderBy: { updated: 'desc' },
         select: { updated: true },
@@ -120,10 +128,19 @@ export class MastersCountService {
       return {
         success: true,
         message: null,
-        data: activeRecords.map((record) => ({
-          id: record.id.toString(),
-          name: record.name,
-        })),
+        data: activeRecords.map((record) => {
+          const mapped: Record<string, string | number> = {
+            id: record.id.toString(),
+            name: record.name,
+          };
+          if (record.states_id !== undefined) {
+            mapped.states_id = record.states_id;
+          }
+          if (record.sub_community_id !== undefined) {
+            mapped.sub_community_id = record.sub_community_id;
+          }
+          return mapped;
+        }),
         deleted: deletedRecords.map((record) => record.id.toString()),
         last_updated: lastUpdatedRecord
           ? Math.floor(lastUpdatedRecord.updated.getTime() / 1000)

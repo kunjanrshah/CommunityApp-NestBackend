@@ -293,10 +293,17 @@ export class SearchRequestDTO {
 
   @Field(() => String, { nullable: true })
   @IsString()
+  @IsOptional()
   orderBy?: string;
 
   @Field(() => String, { nullable: true })
   @IsString()
+  @IsOptional()
+  alpha?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
   orderByVal?: 'asc' | 'desc';
 
   @Field(() => SmartFilterDto, { nullable: true })

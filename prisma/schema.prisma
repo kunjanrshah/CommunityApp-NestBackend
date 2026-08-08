@@ -220,14 +220,17 @@ model SubCommunity {
   deleted Boolean  @default(false)
   updated DateTime @updatedAt
   User    User[]
+  LocalCommunity LocalCommunity[] // One-to-Many relationship with LocalCommunity
 }
 
 model LocalCommunity {
   id      Int      @id @default(autoincrement())
+  sub_community_id Int // Foreign Key to SubCommunity
   name    String
   deleted Boolean  @default(false)
   updated DateTime @updatedAt
   User    User[]
+  subCommunity    SubCommunity  @relation(fields: [sub_community_id], references: [id]) // ✅
 }
 
 model Relations {

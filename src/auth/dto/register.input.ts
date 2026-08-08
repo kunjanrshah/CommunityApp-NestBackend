@@ -50,6 +50,10 @@ export class RegisterInput {
   @Field()
   @IsString()
   address: string;
+
+  @Field(() => Boolean)
+  @IsBoolean()
+  status: boolean;
 }
 
 @ObjectType()

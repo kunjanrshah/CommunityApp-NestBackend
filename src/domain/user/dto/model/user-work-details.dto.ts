@@ -11,6 +11,14 @@ export class UserWorkDetailDTO {
   @IsInt()
   user_id: number;
 
+  @Field(() => Int)
+  @IsInt()
+  committee_id: number;
+
+  @Field(() => Int)
+  @IsInt()
+  designation_id: number;
+
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
