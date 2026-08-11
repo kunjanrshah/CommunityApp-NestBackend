@@ -145,14 +145,8 @@ export class AuthService {
   async login(mobile: string, password: string) {
     const user = await this.validateUser(mobile, password);
 
-    // Generate JWT Token
-    const payload = { id: user.id, mobile: user.mobile, role: user.role };
-    const accessToken = this.jwtService.sign(payload);
-
-    return {
-      accessToken,
-      message: 'Login successful',
-    };
+    // Generate both access & refresh tokens
+    return this.generateTokens(user.id, user.mobile, user.role);
   }
 
   private async sendNotification(

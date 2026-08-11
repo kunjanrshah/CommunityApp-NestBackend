@@ -61,8 +61,8 @@ export class AuthResponse {
   @Field()
   accessToken: string;
 
-  @Field({ nullable: true })
-  refreshToken?: string;
+  @Field()
+  refreshToken: string;
 
   @Field()
   message: string;

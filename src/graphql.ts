@@ -251,7 +251,7 @@ export interface ResetPasswordInput {
 
 export interface AuthResponse {
   accessToken: string;
-  refreshToken?: Nullable<string>;
+  refreshToken: string;
   message: string;
 }
 
