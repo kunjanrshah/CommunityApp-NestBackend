@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 @Injectable()
 export class AppService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
