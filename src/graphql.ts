@@ -34,6 +34,10 @@ export interface GetContactListInput {
   mobiles: string[];
 }
 
+export interface DateInputDto {
+  date?: Nullable<string>;
+}
+
 export interface StatisticsInputDto {
   cityId?: Nullable<number>;
   subCommunityId?: Nullable<number>;
@@ -483,23 +487,34 @@ export interface IQuery {
     input: GetContactListInput,
   ): GetContactListResponse | Promise<GetContactListResponse>;
   getMastersCounts(): MastersCountResponseDTO | Promise<MastersCountResponseDTO>;
-  getCities(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-  getStates(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getCities(date?: Nullable<DateInputDto>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getStates(date?: Nullable<DateInputDto>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
   getBusinessCategories(
-    date?: Nullable<string>,
+    date?: Nullable<DateInputDto>,
   ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-  getCommittees(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-  getDesignations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-  getEducations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getCommittees(
+    date?: Nullable<DateInputDto>,
+  ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getDesignations(
+    date?: Nullable<DateInputDto>,
+  ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getEducations(
+    date?: Nullable<DateInputDto>,
+  ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
   getSubCommunities(
-    date?: Nullable<string>,
+    date?: Nullable<DateInputDto>,
   ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
   getLocalCommunities(
-    date?: Nullable<string>,
+    subCommunityId?: Nullable<number>,
+    date?: Nullable<DateInputDto>,
   ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-  getRelations(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-  getGotras(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
-  getSubCasts(date?: Nullable<string>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getRelations(
+    date?: Nullable<DateInputDto>,
+  ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getGotras(date?: Nullable<DateInputDto>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getSubCasts(
+    date?: Nullable<DateInputDto>,
+  ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
   getCitiesByState(
     stateId: number,
     date?: Nullable<string>,

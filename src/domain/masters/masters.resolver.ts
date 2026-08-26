@@ -5,6 +5,7 @@ import { GetMastersResponseDTO } from './dto/model/get-masters.dto';
 import { CityResponseDto } from './dto/model/getcity.dto';
 import { StatisticsResponseDto } from './dto/model/statistics-response.dto';
 import { StatisticsInputDto } from './dto/statistics-input.dto';
+import { DateInputDto } from './dto/date-input.dto';
 import { Public } from 'src/public.decorator';
 import { MastersCountResponseDTO } from './dto/model/masters-count.dto';
 
@@ -13,27 +14,33 @@ import { MastersCountResponseDTO } from './dto/model/masters-count.dto';
 export class MastersResolver {
   constructor(private readonly mastersService: MastersCountService) {}
 
+  @Public()
   @Query(() => MastersCountResponseDTO)
   async getMastersCounts(): Promise<MastersCountResponseDTO> {
     return this.mastersService.getMastersCounts();
   }
 
+  @Public()
   @Query(() => GetMastersResponseDTO)
-  async getCities(@Args('date', { nullable: true }) date?: string): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('city', date);
+  async getCities(
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
+  ): Promise<GetMastersResponseDTO> {
+    return this.mastersService.getRecords('city', date?.date);
   }
 
   @Public()
   @Query(() => GetMastersResponseDTO)
-  async getStates(@Args('date', { nullable: true }) date?: string): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('state', date);
+  async getStates(
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
+  ): Promise<GetMastersResponseDTO> {
+    return this.mastersService.getRecords('states', date?.date);
   }
 
   @Query(() => GetMastersResponseDTO)
   async getBusinessCategories(
-    @Args('date', { nullable: true }) date?: string,
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
   ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('businessCategory', date);
+    return this.mastersService.getRecords('businessCategory', date?.date);
   }
   // TODO: NO NEED
   // @Query(() => GetMastersResponseDTO)
@@ -45,17 +52,17 @@ export class MastersResolver {
 
   @Query(() => GetMastersResponseDTO)
   async getCommittees(
-    @Args('date', { nullable: true }) date?: string,
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
   ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('committee', date);
+    return this.mastersService.getRecords('committee', date?.date);
   }
 
   // NEED FOR COMMITTEEE
   @Query(() => GetMastersResponseDTO)
   async getDesignations(
-    @Args('date', { nullable: true }) date?: string,
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
   ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('designation', date);
+    return this.mastersService.getRecords('designation', date?.date);
   }
 
   // TODO: NO NEED
@@ -68,23 +75,26 @@ export class MastersResolver {
 
   @Query(() => GetMastersResponseDTO)
   async getEducations(
-    @Args('date', { nullable: true }) date?: string,
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
   ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('education', date);
+    return this.mastersService.getRecords('education', date?.date);
   }
 
+  @Public()
   @Query(() => GetMastersResponseDTO)
   async getSubCommunities(
-    @Args('date', { nullable: true }) date?: string,
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
   ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('subCommunity', date);
+    return this.mastersService.getRecords('subCommunity', date?.date);
   }
 
+  @Public()
   @Query(() => GetMastersResponseDTO)
   async getLocalCommunities(
-    @Args('date', { nullable: true }) date?: string,
+    @Args('subCommunityId', { type: () => Int, nullable: true }) subCommunityId?: number,
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
   ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('localCommunity', date);
+    return this.mastersService.getRecords('localCommunity', date?.date, subCommunityId);
   }
 
   // TODO: NO NEED
@@ -97,22 +107,24 @@ export class MastersResolver {
 
   @Query(() => GetMastersResponseDTO)
   async getRelations(
-    @Args('date', { nullable: true }) date?: string,
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
   ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('relations', date);
+    return this.mastersService.getRecords('relations', date?.date);
   }
 
   @Query(() => GetMastersResponseDTO)
-  async getGotras(@Args('date', { nullable: true }) date?: string): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('gotra', date);
+  async getGotras(
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
+  ): Promise<GetMastersResponseDTO> {
+    return this.mastersService.getRecords('gotra', date?.date);
   }
 
   @Public()
   @Query(() => GetMastersResponseDTO)
   async getSubCasts(
-    @Args('date', { nullable: true }) date?: string,
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
   ): Promise<GetMastersResponseDTO> {
-    return this.mastersService.getRecords('subCast', date);
+    return this.mastersService.getRecords('subCast', date?.date);
   }
 
   @Public()

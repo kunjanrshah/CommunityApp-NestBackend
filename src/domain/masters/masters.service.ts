@@ -80,7 +80,11 @@ export class MastersCountService {
     };
   }
 
-  async getRecords(tableName: string, date?: string): Promise<GetMastersResponseDTO> {
+  async getRecords(
+    tableName: string,
+    date?: string,
+    subCommunityId?: number,
+  ): Promise<GetMastersResponseDTO> {
     try {
       console.log('filterDateIST: ' + date);
 
@@ -102,25 +106,42 @@ export class MastersCountService {
         selectFields.sub_community_id = true;
       }
 
+      // Build where clause - filter by sub_community_id for localCommunity
+      const whereClause: Record<string, unknown> = {
+        deleted: false,
+        updated: { gt: filterDateIST },
+      };
+
+      if (tableName === 'localCommunity' && subCommunityId) {
+        whereClause.sub_community_id = subCommunityId;
+      }
+
       // Fetch active records
       const activeRecords = await this.prisma[tableName].findMany({
-        where: {
-          deleted: false,
-          updated: { gt: filterDateIST },
-        },
+        where: whereClause,
         select: selectFields,
       });
 
       // Fetch deleted records
+      const deletedWhereClause: Record<string, unknown> = {
+        deleted: true,
+        updated: { gt: filterDate },
+      };
+
+      if (tableName === 'localCommunity' && subCommunityId) {
+        deletedWhereClause.sub_community_id = subCommunityId;
+      }
+
       const deletedRecords = await this.prisma[tableName].findMany({
-        where: {
-          deleted: true,
-          updated: { gt: filterDate },
-        },
+        where: deletedWhereClause,
         select: { id: true },
       });
 
       const lastUpdatedRecord = await this.prisma[tableName].findFirst({
+        where:
+          subCommunityId && tableName === 'localCommunity'
+            ? { sub_community_id: subCommunityId }
+            : undefined,
         orderBy: { updated: 'desc' },
         select: { updated: true },
       });

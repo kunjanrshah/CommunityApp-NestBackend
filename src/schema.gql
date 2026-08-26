@@ -251,17 +251,17 @@ type Query {
   getSharingProfiles(userId: Int!): [UserDTO!]!
   getContactList(input: GetContactListInput!): GetContactListResponse!
   getMastersCounts: MastersCountResponseDTO!
-  getCities(date: String): GetMastersResponseDTO!
-  getStates(date: String): GetMastersResponseDTO!
-  getBusinessCategories(date: String): GetMastersResponseDTO!
-  getCommittees(date: String): GetMastersResponseDTO!
-  getDesignations(date: String): GetMastersResponseDTO!
-  getEducations(date: String): GetMastersResponseDTO!
-  getSubCommunities(date: String): GetMastersResponseDTO!
-  getLocalCommunities(date: String): GetMastersResponseDTO!
-  getRelations(date: String): GetMastersResponseDTO!
-  getGotras(date: String): GetMastersResponseDTO!
-  getSubCasts(date: String): GetMastersResponseDTO!
+  getCities(date: DateInputDto): GetMastersResponseDTO!
+  getStates(date: DateInputDto): GetMastersResponseDTO!
+  getBusinessCategories(date: DateInputDto): GetMastersResponseDTO!
+  getCommittees(date: DateInputDto): GetMastersResponseDTO!
+  getDesignations(date: DateInputDto): GetMastersResponseDTO!
+  getEducations(date: DateInputDto): GetMastersResponseDTO!
+  getSubCommunities(date: DateInputDto): GetMastersResponseDTO!
+  getLocalCommunities(subCommunityId: Int, date: DateInputDto): GetMastersResponseDTO!
+  getRelations(date: DateInputDto): GetMastersResponseDTO!
+  getGotras(date: DateInputDto): GetMastersResponseDTO!
+  getSubCasts(date: DateInputDto): GetMastersResponseDTO!
   getCitiesByState(stateId: Int!, date: String, subCommunityId: Int): CityResponseDto!
   getStatistics(input: StatisticsInputDto!): StatisticsResponseDto!
   reminders: [Reminder!]!
@@ -282,6 +282,10 @@ input GetInactiveUsersInput {
 
 input GetContactListInput {
   mobiles: [String!]!
+}
+
+input DateInputDto {
+  date: String
 }
 
 input StatisticsInputDto {

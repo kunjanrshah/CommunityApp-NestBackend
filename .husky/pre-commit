@@ -2,4 +2,6 @@
 
 . "$(dirname "$0")/_/husky.sh"
 
-npx lint-staged
+# lint-staged runs ESLint --fix and Prettier --write only on staged files.
+# --no-install prevents npx from downloading anything at commit time.
+npx --no-install lint-staged
