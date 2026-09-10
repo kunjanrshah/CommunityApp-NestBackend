@@ -34,6 +34,15 @@ export interface GetContactListInput {
   mobiles: string[];
 }
 
+export interface SearchByCityInput {
+  cityId?: Nullable<number>;
+  subCommunityId?: Nullable<number>;
+  alpha?: Nullable<string>;
+  search?: Nullable<string>;
+  start?: Nullable<number>;
+  length?: Nullable<number>;
+}
+
 export interface DateInputDto {
   date?: Nullable<string>;
 }
@@ -379,6 +388,13 @@ export interface GetContactListResponse {
   members?: Nullable<UserDTO[]>;
 }
 
+export interface SearchByCityResponse {
+  success: boolean;
+  totalHead: number;
+  totalMem: number;
+  members: UserDTO[];
+}
+
 export interface MasterDTO {
   id: string;
   name: string;
@@ -486,6 +502,7 @@ export interface IQuery {
   getContactList(
     input: GetContactListInput,
   ): GetContactListResponse | Promise<GetContactListResponse>;
+  searchByCity(input: SearchByCityInput): SearchByCityResponse | Promise<SearchByCityResponse>;
   getMastersCounts(): MastersCountResponseDTO | Promise<MastersCountResponseDTO>;
   getCities(date?: Nullable<DateInputDto>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
   getStates(date?: Nullable<DateInputDto>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;

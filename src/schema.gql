@@ -150,6 +150,17 @@ type GetContactListResponse {
   members: [UserDTO!]
 }
 
+type SearchByCityResponse {
+  success: Boolean!
+
+  """Number of head users (rows) that matched the filter before pagination."""
+  totalHead: Int!
+
+  """Total count of family members headed under all matched head users."""
+  totalMem: Int!
+  members: [UserDTO!]!
+}
+
 type MasterDTO {
   id: String!
   name: String!
@@ -250,6 +261,7 @@ type Query {
   getSharedProfiles(userId: Int!): [UserDTO!]!
   getSharingProfiles(userId: Int!): [UserDTO!]!
   getContactList(input: GetContactListInput!): GetContactListResponse!
+  searchByCity(input: SearchByCityInput!): SearchByCityResponse!
   getMastersCounts: MastersCountResponseDTO!
   getCities(date: DateInputDto): GetMastersResponseDTO!
   getStates(date: DateInputDto): GetMastersResponseDTO!
@@ -282,6 +294,22 @@ input GetInactiveUsersInput {
 
 input GetContactListInput {
   mobiles: [String!]!
+}
+
+input SearchByCityInput {
+  """City id to filter users (matches the user’s address city)."""
+  cityId: Int
+  subCommunityId: Int
+
+  """Filter users whose first_name starts with this alphabet (e.g. "A")."""
+  alpha: String
+
+  """
+  Free text searched across member_code, first_name, mobile, email, city and state.
+  """
+  search: String
+  start: Int
+  length: Int
 }
 
 input DateInputDto {

@@ -11,6 +11,8 @@ import { StatusChangeResponseDto } from './dto/model/status-change-response.dto'
 import { StatusChangeService } from './status-change.service';
 import { GetContactListResponse } from './dto/model/get-contact-list.response';
 import { GetContactListInput } from './dto/get-contact-list.input';
+import { SearchByCityInput } from './dto/search-by-city.input';
+import { SearchByCityResponse } from './dto/model/search-by-city.response';
 
 @Resolver(() => UserDTO)
 export class UserResolver {
@@ -96,6 +98,11 @@ export class UserResolver {
   @Query(() => GetContactListResponse)
   async getContactList(@Args('input') input: GetContactListInput): Promise<GetContactListResponse> {
     return this.userService.getContactList(input);
+  }
+
+  @Query(() => SearchByCityResponse)
+  async searchByCity(@Args('input') input: SearchByCityInput): Promise<SearchByCityResponse> {
+    return this.userService.searchByCity(input);
   }
 
   // @Query(() => String)

@@ -6,6 +6,9 @@ import { ChangeRoleInput } from './dto/change-role.dto';
 import { GetInactiveUsersInput } from './dto/get-inactive-users.dto';
 import { GetContactListInput } from './dto/get-contact-list.input';
 import { GetContactListResponse } from './dto/model/get-contact-list.response';
+import { SearchByCityInput } from './dto/search-by-city.input';
+import { SearchByCityResponse } from './dto/model/search-by-city.response';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -463,6 +466,99 @@ export class UserService {
         members: [],
       };
     }
+  }
+
+  /**
+   * Converts the legacy REST "SearchByCity" endpoint into GraphQL.
+   *
+   * Equivalent PHP logic (Users_model::get_datatables_for_api):
+   *  - joins users with cities, states, sub_community, local_community, sub_casts
+   *  - filters status != 0 and only head users (head_id = 0) for the member list
+   *  - optional sub_community_id equality filter
+   *  - optional alphabet filter on first_name (LIKE 'alpha%')
+   *  - optional free text search across member_code, first_name, mobile,
+   *    email, city and state
+   * Returns success, totalHead (number of matching head users), totalMem
+   * (sum of family members under all matched heads) and the paged member list.
+   */
+  async searchByCity(input: SearchByCityInput): Promise<SearchByCityResponse> {
+    const { start = 0, length = 10 } = input;
+
+    const where = this.buildSearchByCityWhere(input);
+
+    const totalHead = await this.prisma.user.count({ where });
+
+    const members = await this.prisma.user.findMany({
+      where,
+      skip: start >= 0 ? start : 0,
+      take: length > 0 ? length : 10,
+      orderBy: { first_name: 'asc' },
+      include: {
+        userAddress: true,
+      },
+    });
+
+    // Sum the family member count under each matched head user.
+    let totalMem = 0;
+    for (const member of members) {
+      totalMem += await this.getMemberFamilyCount(member.id);
+    }
+
+    return {
+      success: true,
+      totalHead,
+      totalMem,
+      members,
+    };
+  }
+
+  private buildSearchByCityWhere(input: SearchByCityInput): Prisma.UserWhereInput {
+    const { cityId, subCommunityId, alpha, search } = input;
+
+    const where: Prisma.UserWhereInput = {
+      // Mirrors the legacy "users.status != 0" filter.
+      status: true,
+      deleted: false,
+      // Legacy query only lists head users in the member list.
+      head_id: 0,
+      ...(subCommunityId ? { sub_community_id: subCommunityId } : {}),
+      ...(cityId ? { userAddress: { city_id: cityId } } : {}),
+      ...(alpha ? { first_name: { startsWith: alpha } } : {}),
+      ...(search ? this.buildSearchByCityFreeText(search) : {}),
+    };
+
+    return where;
+  }
+
+  private buildSearchByCityFreeText(search: string): Prisma.UserWhereInput {
+    return {
+      OR: [
+        { member_code: { contains: search, mode: 'insensitive' } },
+        { first_name: { contains: search, mode: 'insensitive' } },
+        { mobile: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        {
+          userAddress: {
+            city: { name: { contains: search, mode: 'insensitive' } },
+          },
+        },
+        {
+          userAddress: {
+            states: { name: { contains: search, mode: 'insensitive' } },
+          },
+        },
+      ],
+    };
+  }
+
+  private async getMemberFamilyCount(headId: number): Promise<number> {
+    return this.prisma.user.count({
+      where: {
+        head_id: headId,
+        is_expired: false,
+        status: true,
+      },
+    });
   }
 
   // async findUserById(id: number) {
