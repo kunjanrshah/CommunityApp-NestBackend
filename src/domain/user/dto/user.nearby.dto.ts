@@ -30,4 +30,8 @@ export class GetNearbyUsersInput {
   @Field(() => Int, { nullable: true })
   @IsInt()
   subCommunityId?: number;
+
+  @Field(() => Int, { nullable: true }) // requesting user, excluded from results (legacy $cleanerIds behaviour)
+  @IsInt()
+  user_id?: number;
 }

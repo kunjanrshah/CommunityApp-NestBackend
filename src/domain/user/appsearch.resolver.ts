@@ -17,7 +17,12 @@ export class AppSearchResolver {
 
   @Query(() => SearchResult)
   async smartSearch(@Args('input') input: SearchInput) {
-    return this.smartSearchService.smartSearch(input.start, input.length, input.filterBy);
+    return this.smartSearchService.smartSearch(
+      input.start,
+      input.length,
+      input.filterBy,
+      input.sub_community_id,
+    );
   }
 
   @Query(() => SearchResult)

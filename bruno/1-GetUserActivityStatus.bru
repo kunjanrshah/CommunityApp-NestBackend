@@ -1,0 +1,52 @@
+meta {
+  name: 1 - GetUserActivityStatus (mutation)
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  ~Authorization: Bearer {{token}}
+}
+
+body:graphql {
+  query GetUserActivityStatus($input: GetUserActivityStatusInput!) {
+    getUserActivityStatus(input: $input) {
+      success
+      message
+      data {
+        id
+        last_login
+        login_status
+        online_status
+      }
+    }
+  }
+  vars: {
+    "input": {
+      "id": 1
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "id": 1
+    }
+  }
+}
+
+script:post-response {
+  // Show quick summary in Bruno console
+  if (res.body?.data?.getUserActivityStatus) {
+    const r = res.body.data.getUserActivityStatus;
+    console.log(`success=${r.success} message=${r.message} rows=${r.data?.length ?? 0}`);
+  }
+}

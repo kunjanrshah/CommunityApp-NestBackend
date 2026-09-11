@@ -9,8 +9,12 @@ export class NearBySearchService {
   constructor(private prisma: PrismaService) {}
 
   async getNearByUsers(input: GetNearbyUsersInput): Promise<SearchResult> {
-    const { lat, lng, km, nearBy, subCommunityId, start = 0, length = 10 } = input;
+    const { lat, lng, km, nearBy, subCommunityId, user_id, start = 0, length = 10 } = input;
 
+    // Legacy: nearBy in ('Home','Office','User') pins that address type with a
+    // HAVING distance <= km; otherwise home+office candidates are checked and
+    // any non-empty distance string passes (no per-type enable gate on the
+    // combined path, `User` live location is only used when explicitly asked).
     const locationTypes =
       nearBy === 'Home'
         ? ['Home']
@@ -18,16 +22,20 @@ export class NearBySearchService {
         ? ['Office']
         : nearBy === 'User'
         ? ['User']
-        : ['Home', 'Office', 'User']; // "All"
+        : ['Home', 'Office'];
 
     const users = await this.prisma.user.findMany({
       where: {
         status: true,
+        // Legacy `if ($cleanerIds != "")` excludes the requesting user.
+        ...(user_id ? { id: { not: user_id } } : {}),
         ...(subCommunityId && { sub_community_id: subCommunityId }),
         userLocations: {
           some: {
             location_type: { in: locationTypes },
-            is_location_enable: true,
+            // Legacy combined ("All") path does not gate on is_location_enable
+            // (only the explicit 'User' path required it).
+            ...(nearBy === 'User' ? { is_location_enable: true } : {}),
           },
         },
       },

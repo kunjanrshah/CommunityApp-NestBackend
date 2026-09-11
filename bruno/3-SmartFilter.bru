@@ -1,0 +1,76 @@
+meta {
+  name: 3 - SmartFilter (query)
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  ~Authorization: Bearer {{token}}
+}
+
+body:graphql {
+  query SmartFilter($input: SearchRequestDTO!) {
+    smartFilter(input: $input) {
+      totalRecords
+      members {
+        id
+        first_name
+        father_name
+        mother_name
+        member_code
+        gender
+        sub_community_id
+        userPersonalDetail {
+          marital_status
+          birth_date
+          marriage_date
+          blood_group
+        }
+      }
+    }
+  }
+  vars: {
+    "input": {
+      "start": 0,
+      "length": 10,
+      "orderByVal": "asc",
+      "alpha": null,
+      "filter_by": {
+        "first_name": "rahul",
+        "sub_community_id": 1
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "start": 0,
+      "length": 10,
+      "orderBy": null,
+      "orderByVal": "asc",
+      "alpha": null,
+      "filter_by": {
+        "first_name": "rahul",
+        "sub_community_id": 1,
+        "gender": null,
+        "marital_status": null,
+        "min_age": null,
+        "max_age": null,
+        "min_height": null,
+        "max_height": null,
+        "city_id": null,
+        "education_id": null,
+        "occupation_id": null
+      }
+    }
+  }
+}

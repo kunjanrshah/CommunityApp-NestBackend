@@ -119,4 +119,19 @@ export class UserDTO {
 
   @Field(() => String, { nullable: true })
   nearBy?: string; // "home", "office", or "user"
+
+  @Field(() => Int, { nullable: true })
+  member_count?: number; // Count of family members under this head user
+
+  @Field(() => String, { nullable: true })
+  matched?: string; // Which date field(s) matched for GetUsersByDate
+
+  @Field(() => String, { nullable: true })
+  reminder_birth_date?: string;
+
+  @Field(() => String, { nullable: true })
+  reminder_marriage_date?: string;
+
+  @Field(() => String, { nullable: true })
+  reminder_expire_date?: string;
 }

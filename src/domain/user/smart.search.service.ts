@@ -6,10 +6,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class SmartSearchService {
   constructor(private prisma: PrismaService) {}
 
-  async smartSearch(start: number, length: number, filterBy?: string) {
+  async smartSearch(start: number, length: number, filterBy?: string, subCommunityId?: number) {
     if (!filterBy) return { totalRecords: 0, members: [] };
 
     const whereCondition: Prisma.UserWhereInput = {
+      // Legacy get_global_search uses "users.status != 0"
+      status: { not: false },
+      deleted: false,
+      ...(subCommunityId ? { sub_community_id: subCommunityId } : {}),
       OR: [
         { first_name: { contains: filterBy, mode: 'insensitive' } },
         { member_code: { contains: filterBy, mode: 'insensitive' } },
@@ -89,55 +93,72 @@ export class SmartSearchService {
 
     const totalCount = await this.prisma.user.count({ where: whereCondition });
 
-    // Extract matched fields
-    const formattedUsers = users.map((user) => {
-      const matchedFields = [];
+    // Extract matched fields and compute member_count (family members)
+    // under each matched head user - mirrors legacy `member_count` subquery.
+    const formattedUsers = await Promise.all(
+      users.map(async (user) => {
+        const matchedFields = [];
 
-      if (user.first_name?.includes(filterBy)) matchedFields.push('FirstName');
-      if (user.subCast?.name?.includes(filterBy)) matchedFields.push('LastName');
-      if (user.member_code?.includes(filterBy)) matchedFields.push('MemberCode');
-      if (user.email?.includes(filterBy)) matchedFields.push('Email');
-      if (user.mobile?.includes(filterBy)) matchedFields.push('Mobile');
-      if (user.phone?.includes(filterBy)) matchedFields.push('Phone');
-      if (user.father_name?.includes(filterBy)) matchedFields.push('FatherName');
-      if (user.mother_name?.includes(filterBy)) matchedFields.push('MotherName');
-      if (user.region?.includes(filterBy)) matchedFields.push('Region');
+        if (user.first_name?.includes(filterBy)) matchedFields.push('FirstName');
+        if (user.subCast?.name?.includes(filterBy)) matchedFields.push('LastName');
+        if (user.member_code?.includes(filterBy)) matchedFields.push('MemberCode');
+        if (user.email?.includes(filterBy)) matchedFields.push('Email');
+        if (user.mobile?.includes(filterBy)) matchedFields.push('Mobile');
+        if (user.phone?.includes(filterBy)) matchedFields.push('Phone');
+        if (user.father_name?.includes(filterBy)) matchedFields.push('FatherName');
+        if (user.mother_name?.includes(filterBy)) matchedFields.push('MotherName');
+        if (user.region?.includes(filterBy)) matchedFields.push('Region');
 
-      if (user.userAddress?.area?.includes(filterBy)) matchedFields.push('Area');
-      if (user.userAddress?.address?.includes(filterBy)) matchedFields.push('Address');
-      if (user.userAddress?.local_address?.includes(filterBy)) matchedFields.push('LocalAddress');
-      if (user.userAddress?.city?.name?.includes(filterBy)) matchedFields.push('City');
-      if (user.userAddress?.states?.name?.includes(filterBy)) matchedFields.push('State');
+        if (user.userAddress?.area?.includes(filterBy)) matchedFields.push('Area');
+        if (user.userAddress?.address?.includes(filterBy)) matchedFields.push('Address');
+        if (user.userAddress?.local_address?.includes(filterBy)) matchedFields.push('LocalAddress');
+        if (user.userAddress?.city?.name?.includes(filterBy)) matchedFields.push('City');
+        if (user.userAddress?.states?.name?.includes(filterBy)) matchedFields.push('State');
 
-      if (user.userPersonalDetail?.blood_group?.includes(filterBy)) {
-        matchedFields.push('BloodGroup');
-      }
-      if (user.userPersonalDetail?.native_place?.name?.includes(filterBy)) {
-        matchedFields.push('Native');
-      }
-      if (user.userPersonalDetail?.gotra?.name?.includes(filterBy)) matchedFields.push('Gotra');
+        if (user.userPersonalDetail?.blood_group?.includes(filterBy)) {
+          matchedFields.push('BloodGroup');
+        }
+        if (user.userPersonalDetail?.native_place?.name?.includes(filterBy)) {
+          matchedFields.push('Native');
+        }
+        if (user.userPersonalDetail?.gotra?.name?.includes(filterBy)) matchedFields.push('Gotra');
 
-      if (user.userWorkDetail?.company_name?.includes(filterBy)) matchedFields.push('CompanyName');
-      if (user.userWorkDetail?.work_details?.includes(filterBy)) matchedFields.push('WorkDetails');
-      if (user.userWorkDetail?.businessCategory?.name.includes(filterBy)) {
-        matchedFields.push('Business');
-      }
-      if (user.userWorkDetail?.committee?.name?.includes(filterBy)) matchedFields.push('Committee');
-      if (user.userWorkDetail?.designation?.name?.includes(filterBy)) {
-        matchedFields.push('Designation');
-      }
+        if (user.userWorkDetail?.company_name?.includes(filterBy)) {
+          matchedFields.push('CompanyName');
+        }
+        if (user.userWorkDetail?.work_details?.includes(filterBy)) {
+          matchedFields.push('WorkDetails');
+        }
+        if (user.userWorkDetail?.businessCategory?.name.includes(filterBy)) {
+          matchedFields.push('Business');
+        }
+        if (user.userWorkDetail?.committee?.name?.includes(filterBy)) {
+          matchedFields.push('Committee');
+        }
+        if (user.userWorkDetail?.designation?.name?.includes(filterBy)) {
+          matchedFields.push('Designation');
+        }
 
-      if (user.userMatrimony?.hobby?.includes(filterBy)) matchedFields.push('Hobby');
-      if (user.userMatrimony?.about_me?.includes(filterBy)) matchedFields.push('AboutMe');
+        if (user.userMatrimony?.hobby?.includes(filterBy)) matchedFields.push('Hobby');
+        if (user.userMatrimony?.about_me?.includes(filterBy)) matchedFields.push('AboutMe');
 
-      if (user.occupation?.name?.includes(filterBy)) matchedFields.push('Occupation');
-      if (user.education?.name?.includes(filterBy)) matchedFields.push('Education');
-      if (user.relation?.name?.includes(filterBy)) matchedFields.push('Relation');
-      if (user.localCommunity?.name?.includes(filterBy)) matchedFields.push('LocalCommunity');
-      if (user.subCommunity?.name?.includes(filterBy)) matchedFields.push('SubCommunity');
+        if (user.occupation?.name?.includes(filterBy)) matchedFields.push('Occupation');
+        if (user.education?.name?.includes(filterBy)) matchedFields.push('Education');
+        if (user.relation?.name?.includes(filterBy)) matchedFields.push('Relation');
+        if (user.localCommunity?.name?.includes(filterBy)) matchedFields.push('LocalCommunity');
+        if (user.subCommunity?.name?.includes(filterBy)) matchedFields.push('SubCommunity');
 
-      return { ...user, matchedFields };
-    });
+        // Family member count for head users (mirrors legacy subquery).
+        const memberCount =
+          user.head_id === 0
+            ? await this.prisma.user.count({
+                where: { head_id: user.id, is_expired: false, status: true },
+              })
+            : 0;
+
+        return { ...user, matchedFields, member_count: memberCount };
+      }),
+    );
 
     return { totalRecords: totalCount, members: formattedUsers };
   }

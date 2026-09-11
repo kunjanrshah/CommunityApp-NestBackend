@@ -23,6 +23,17 @@ export enum Role {
   USER = 'USER',
 }
 
+export interface GetUsersByDateInput {
+  fromdate?: Nullable<string>;
+  todate?: Nullable<string>;
+  date?: Nullable<string>;
+  filter?: Nullable<number>;
+  id?: Nullable<number>;
+  sub_community_id?: Nullable<number>;
+  start: number;
+  length: number;
+}
+
 export interface GetInactiveUsersInput {
   start?: Nullable<number>;
   limit?: Nullable<number>;
@@ -57,6 +68,7 @@ export interface SearchInput {
   start: number;
   length: number;
   filterBy?: Nullable<string>;
+  sub_community_id?: Nullable<number>;
 }
 
 export interface SearchRequestDTO {
@@ -130,6 +142,7 @@ export interface GetNearbyUsersInput {
   start?: Nullable<number>;
   length?: Nullable<number>;
   subCommunityId?: Nullable<number>;
+  user_id?: Nullable<number>;
 }
 
 export interface ChangePasswordInput {
@@ -199,6 +212,10 @@ export interface UpsertUserInput {
   is_shani: boolean;
   facebook_profile?: Nullable<string>;
   expectation?: Nullable<string>;
+}
+
+export interface GetUserActivityStatusInput {
+  id: number;
 }
 
 export interface ChangeRoleInput {
@@ -371,6 +388,11 @@ export interface UserDTO {
   matchedFields?: Nullable<string[]>;
   distance?: Nullable<string>;
   nearBy?: Nullable<string>;
+  member_count?: Nullable<number>;
+  matched?: Nullable<string>;
+  reminder_birth_date?: Nullable<string>;
+  reminder_marriage_date?: Nullable<string>;
+  reminder_expire_date?: Nullable<string>;
 }
 
 export interface ChangePasswordResponse {
@@ -393,6 +415,26 @@ export interface SearchByCityResponse {
   totalHead: number;
   totalMem: number;
   members: UserDTO[];
+}
+
+export interface GetUsersByDateResponse {
+  success: boolean;
+  message?: Nullable<string>;
+  total_records: number;
+  members: UserDTO[];
+}
+
+export interface UserActivityStatusDTO {
+  id: number;
+  last_login?: Nullable<DateTime>;
+  login_status?: Nullable<boolean>;
+  online_status: number;
+}
+
+export interface GetUserActivityStatusResponse {
+  success: boolean;
+  message?: Nullable<string>;
+  data?: Nullable<UserActivityStatusDTO[]>;
 }
 
 export interface MasterDTO {
@@ -496,6 +538,7 @@ export interface IQuery {
     page: number,
     limit: number,
   ): UserDTO[] | Promise<UserDTO[]>;
+  usersByDate(input: GetUsersByDateInput): GetUsersByDateResponse | Promise<GetUsersByDateResponse>;
   getInactiveUsers(input: GetInactiveUsersInput): UserDTO[] | Promise<UserDTO[]>;
   getSharedProfiles(userId: number): UserDTO[] | Promise<UserDTO[]>;
   getSharingProfiles(userId: number): UserDTO[] | Promise<UserDTO[]>;
@@ -554,6 +597,9 @@ export interface IMutation {
   ): ChangePasswordResponse | Promise<ChangePasswordResponse>;
   upsertUser(upsertUserInput: UpsertUserInput): UserDTO | Promise<UserDTO>;
   updateLastLogin(user_id: number): boolean | Promise<boolean>;
+  getUserActivityStatus(
+    input: GetUserActivityStatusInput,
+  ): GetUserActivityStatusResponse | Promise<GetUserActivityStatusResponse>;
   deleteUserById(userId: number): string | Promise<string>;
   changeRole(input: ChangeRoleInput): string | Promise<string>;
   statusChange(

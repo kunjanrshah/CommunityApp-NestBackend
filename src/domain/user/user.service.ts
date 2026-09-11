@@ -9,6 +9,12 @@ import { GetContactListResponse } from './dto/model/get-contact-list.response';
 import { SearchByCityInput } from './dto/search-by-city.input';
 import { SearchByCityResponse } from './dto/model/search-by-city.response';
 import { Prisma } from '@prisma/client';
+import {
+  GetUserActivityStatusInput,
+  GetUserActivityStatusResponse,
+  UserActivityStatusDTO,
+} from './dto/activity-status.dto';
+import { GetUsersByDateInput, GetUsersByDateResponse } from './dto/user.by-date.dto';
 
 @Injectable()
 export class UserService {
@@ -285,6 +291,83 @@ export class UserService {
     }
   }
 
+  /**
+   * Mirrors the legacy REST "GetUserActivityStatus" endpoint:
+   *  - updates the given user's last_login to the current IST timestamp
+   *  - returns online status for the user and, if present, all members
+   *    sharing the same head_id.
+   *
+   * Online logic (from PHP):
+   *  - a user is considered online when login_status is true AND last_login
+   *    falls within the last 3.5 minutes (currentTime = now - 3.5min).
+   */
+  async getUserActivityStatus(
+    input: GetUserActivityStatusInput,
+  ): Promise<GetUserActivityStatusResponse> {
+    const { id } = input;
+
+    if (!id) {
+      return { success: false, message: 'Not User found', data: null };
+    }
+
+    // Existence check BEFORE any update so unknown ids return the
+    // contract fail payload instead of a Prisma P2025 error.
+    const existing = await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return { success: false, message: 'Not User found', data: null };
+    }
+
+    const istOffset = 5.5 * 60 * 60 * 1000; // IST = UTC+5:30
+    const now = new Date();
+    const istDate = new Date(now.getTime() + istOffset);
+
+    // Update the user's last_login timestamp to the current IST time.
+    await this.prisma.user.update({
+      where: { id },
+      data: { last_login: istDate },
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true, last_login: true, login_status: true, head_id: true },
+    });
+
+    if (!user) {
+      return { success: false, message: 'Not User found', data: null };
+    }
+
+    // Fetch the user plus all members that share the same head.
+    const headId = user.head_id === 0 ? user.id : user.head_id;
+    const relatedUsers = await this.prisma.user.findMany({
+      where: {
+        OR: [{ id }, { head_id: headId }],
+      },
+      select: { id: true, last_login: true, login_status: true },
+    });
+
+    const currentTime = now.getTime() - 60 * 3.5 * 1000; // now minus 3.5 minutes
+
+    const data: UserActivityStatusDTO[] = relatedUsers.map((u) => {
+      const lastLogin = u.last_login ? u.last_login.getTime() : 0;
+      let online = 0;
+      if (currentTime <= lastLogin && u.login_status) {
+        online = 1;
+      }
+      return {
+        id: u.id,
+        login_status: u.login_status,
+        last_login: u.last_login,
+        online_status: online,
+      };
+    });
+
+    return { success: true, message: 'Users online updated', data };
+  }
+
   async getFamilyMembers(head_id: number) {
     return this.prisma.user.findMany({
       where: { head_id },
@@ -335,6 +418,143 @@ export class UserService {
         },
       },
     });
+  }
+
+  /**
+   * Mirrors the legacy REST "GetUsersByDate" endpoint (API_model::getUsersByDate).
+   * Matches users whose birth_date / marriage_date / expire_date month-day
+   * (MM-DD, anniversary style) falls inside the [fromdate, todate] range.
+   * `filter`: 0 = birth_date, 1 = marriage_date, 2 = expire_date.
+   * When omitted, all three date fields are checked and `matched` lists
+   * every field that fell in range. Prisma Reminder rows for the requesting
+   * user (`id`) are attached as reminder_<field> ids ('0' when none).
+   */
+  async getUsersByDate(input: GetUsersByDateInput): Promise<GetUsersByDateResponse> {
+    const { fromdate, todate, date, filter, id, sub_community_id, start = 0, length = 25 } = input;
+
+    const dateFields = ['birth_date', 'marriage_date', 'expire_date'] as const;
+    type DateField = (typeof dateFields)[number];
+    const fieldsToCheck: DateField[] =
+      filter !== undefined && dateFields[filter] ? [dateFields[filter]] : [...dateFields];
+
+    const toMonthDay = (value: string | Date): string | null => {
+      if (!value) return null;
+      const d = value instanceof Date ? value : new Date(value);
+      if (Number.isNaN(d.getTime())) return null;
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      if (mm === '01' && dd === '01' && d.getFullYear() <= 1970) return null;
+      return `${mm}-${dd}`;
+    };
+
+    const monthDayInRange = (md: string | null): boolean => {
+      if (!md) return false;
+      // Exact single-date match (mirrors getUsersByDateCount).
+      if (date) {
+        const target = toMonthDay(date);
+        return md === target;
+      }
+      if (!(fromdate && todate)) return false;
+      const from = toMonthDay(fromdate);
+      const to = toMonthDay(todate);
+      if (!from || !to) return false;
+      // Anniversary-style wrap-around support (e.g. Dec -> Jan).
+      if (from <= to) return from <= md && md <= to;
+      return md >= from || md <= to;
+    };
+
+    const baseWhere: Prisma.UserWhereInput = {
+      status: true,
+      deleted: false,
+      ...(sub_community_id ? { sub_community_id } : {}),
+    };
+
+    const users = await this.prisma.user.findMany({
+      where: baseWhere,
+      include: {
+        userAddress: true,
+        userPersonalDetail: true,
+        userWorkDetail: true,
+        userMatrimony: true,
+        subCast: true,
+        subCommunity: true,
+        localCommunity: true,
+        relation: true,
+        occupation: true,
+        education: true,
+      },
+      orderBy: { first_name: 'asc' },
+    });
+
+    const getDate = (user: (typeof users)[number], field: DateField): Date | null => {
+      if (field === 'expire_date') return user.expire_date;
+      return user.userPersonalDetail ? user.userPersonalDetail[field] : null;
+    };
+
+    // Fetch reminders for the requesting user once (legacy getRemindersById).
+    const reminderIds = new Map<string, number>();
+    if (id) {
+      const reminders = await this.prisma.reminder.findMany({ where: { user_id: id } });
+      for (const r of reminders) {
+        reminderIds.set(`${r.rem_type}`, r.id);
+      }
+    }
+
+    const filtered = users.filter((user) =>
+      fieldsToCheck.some((field) => monthDayInRange(toMonthDay(getDate(user, field)))),
+    );
+
+    if (!filtered.length) {
+      return { success: false, message: 'Data not found', total_records: 0, members: [] };
+    }
+
+    const paged = filtered.slice(start >= 0 ? start : 0, (start >= 0 ? start : 0) + length);
+
+    // Legacy `member_count` = non-expired family members under each head user.
+    const headIds = [...new Set(paged.filter((u) => u.head_id === 0).map((u) => u.id))];
+    const memberCounts = new Map<number, number>();
+    if (headIds.length) {
+      const counts = await this.prisma.user.groupBy({
+        by: ['head_id'],
+        where: { head_id: { in: headIds }, is_expired: false },
+        _count: { head_id: true },
+      });
+      for (const c of counts) memberCounts.set(c.head_id, c._count.head_id);
+    }
+
+    const members = paged.map((user) => {
+      const result = { ...user } as Record<string, unknown>;
+      const matched: string[] = [];
+      for (const field of fieldsToCheck) {
+        if (monthDayInRange(toMonthDay(getDate(user, field)))) {
+          matched.push(field);
+          // Legacy keys reminder by (user_id, profile_id, reminder_type);
+          // Prisma Reminder has rem_type/message, so match rem_type to the field.
+          const reminderId = id ? String(reminderIds.get(field) ?? '0') : '0';
+          result[`reminder_${field}`] = reminderId;
+        }
+      }
+      result['matched'] = matched.join(',');
+      result['member_count'] = user.head_id === 0 ? memberCounts.get(user.id) ?? 0 : 0;
+      return result as unknown as (typeof users)[number] & {
+        matched?: string;
+        reminder_birth_date?: string;
+        reminder_marriage_date?: string;
+        reminder_expire_date?: string;
+      };
+    });
+
+    return {
+      success: true,
+      message: 'Data Retrived',
+      total_records: filtered.length,
+      members: members as unknown as GetUsersByDateResponse['members'],
+    };
+  }
+
+  private getUserDate(user, field) {
+    if (field === 'expire_date') return user.expire_date;
+    return user.userPersonalDetail ? user.userPersonalDetail[field] : null;
   }
 
   async deleteUser(id: number): Promise<string> {

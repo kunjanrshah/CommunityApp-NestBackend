@@ -1,0 +1,53 @@
+meta {
+  name: 2 - SmartSearch (query)
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  ~Authorization: Bearer {{token}}
+}
+
+body:graphql {
+  query SmartSearch($input: SearchInput!) {
+    smartSearch(input: $input) {
+      totalRecords
+      members {
+        id
+        first_name
+        member_code
+        email
+        mobile
+        sub_community_id
+        matchedFields
+        member_count
+      }
+    }
+  }
+  vars: {
+    "input": {
+      "start": 0,
+      "length": 10,
+      "filterBy": "shah",
+      "sub_community_id": null
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "start": 0,
+      "length": 10,
+      "filterBy": "shah",
+      "sub_community_id": null
+    }
+  }
+}

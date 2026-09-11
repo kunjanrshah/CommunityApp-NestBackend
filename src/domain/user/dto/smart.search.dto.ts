@@ -14,4 +14,8 @@ export class SearchInput {
   @Field({ nullable: true })
   @IsString()
   filterBy?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  sub_community_id?: number;
 }

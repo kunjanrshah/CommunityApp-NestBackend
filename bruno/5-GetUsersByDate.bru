@@ -1,0 +1,67 @@
+meta {
+  name: 5 - GetUsersByDate (query)
+  type: graphql
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  ~Authorization: Bearer {{token}}
+}
+
+body:graphql {
+  query UsersByDate($input: GetUsersByDateInput!) {
+    usersByDate(input: $input) {
+      success
+      message
+      total_records
+      members {
+        id
+        first_name
+        member_code
+        expire_date
+        matched
+        reminder_birth_date
+        reminder_marriage_date
+        reminder_expire_date
+        userPersonalDetail {
+          birth_date
+          marriage_date
+        }
+      }
+    }
+  }
+  vars: {
+    "input": {
+      "fromdate": "2026-01-01",
+      "todate": "2026-12-31",
+      "date": null,
+      "filter": null,
+      "id": 1,
+      "sub_community_id": null,
+      "start": 0,
+      "length": 25
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "fromdate": "2026-01-01",
+      "todate": "2026-12-31",
+      "date": null,
+      "filter": null,
+      "id": 1,
+      "sub_community_id": null,
+      "start": 0,
+      "length": 25
+    }
+  }
+}

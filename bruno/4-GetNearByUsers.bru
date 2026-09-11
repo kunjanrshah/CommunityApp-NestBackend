@@ -1,0 +1,58 @@
+meta {
+  name: 4 - GetNearByUsers (query)
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  ~Authorization: Bearer {{token}}
+}
+
+body:graphql {
+  query NearByUsers($filter: GetNearbyUsersInput!) {
+    nearByUsers(filter: $filter) {
+      totalRecords
+      members {
+        id
+        first_name
+        mobile
+        nearBy
+        distance
+      }
+    }
+  }
+  vars: {
+    "filter": {
+      "lat": 23.0225,
+      "lng": 72.5714,
+      "km": 10,
+      "nearBy": "Home",
+      "start": 0,
+      "length": 10,
+      "subCommunityId": null,
+      "user_id": 1
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "filter": {
+      "lat": 23.0225,
+      "lng": 72.5714,
+      "km": 10,
+      "nearBy": "Home",
+      "start": 0,
+      "length": 10,
+      "subCommunityId": null,
+      "user_id": 1
+    }
+  }
+}

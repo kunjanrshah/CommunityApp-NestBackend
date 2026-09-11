@@ -128,6 +128,11 @@ type UserDTO {
   matchedFields: [String!]
   distance: String
   nearBy: String
+  member_count: Int
+  matched: String
+  reminder_birth_date: String
+  reminder_marriage_date: String
+  reminder_expire_date: String
 }
 
 enum Role {
@@ -159,6 +164,26 @@ type SearchByCityResponse {
   """Total count of family members headed under all matched head users."""
   totalMem: Int!
   members: [UserDTO!]!
+}
+
+type GetUsersByDateResponse {
+  success: Boolean!
+  message: String
+  total_records: Int!
+  members: [UserDTO!]!
+}
+
+type UserActivityStatusDTO {
+  id: Int!
+  last_login: DateTime
+  login_status: Boolean
+  online_status: Int!
+}
+
+type GetUserActivityStatusResponse {
+  success: Boolean!
+  message: String
+  data: [UserActivityStatusDTO!]
 }
 
 type MasterDTO {
@@ -257,6 +282,7 @@ type UploadModel {
 type Query {
   getFamilyMembers(head_id: Float!): [UserDTO!]!
   usersByDateRange(fromDate: String!, toDate: String!, page: Float!, limit: Float!): [UserDTO!]!
+  usersByDate(input: GetUsersByDateInput!): GetUsersByDateResponse!
   getInactiveUsers(input: GetInactiveUsersInput!): [UserDTO!]!
   getSharedProfiles(userId: Int!): [UserDTO!]!
   getSharingProfiles(userId: Int!): [UserDTO!]!
@@ -283,6 +309,17 @@ type Query {
   smartFilter(input: SearchRequestDTO!): SearchResult!
   nearByUsers(filter: GetNearbyUsersInput!): SearchResult!
   isAppVersionExists(version: Float!): Boolean!
+}
+
+input GetUsersByDateInput {
+  fromdate: String
+  todate: String
+  date: String
+  filter: Int
+  id: Int
+  sub_community_id: Int
+  start: Int! = 0
+  length: Int! = 25
 }
 
 input GetInactiveUsersInput {
@@ -326,6 +363,7 @@ input SearchInput {
   start: Int! = 0
   length: Int! = 10
   filterBy: String
+  sub_community_id: Int
 }
 
 input SearchRequestDTO {
@@ -399,6 +437,7 @@ input GetNearbyUsersInput {
   start: Int
   length: Int
   subCommunityId: Int
+  user_id: Int
 }
 
 type Mutation {
@@ -406,6 +445,7 @@ type Mutation {
   changePassword(ChangePasswordInput: ChangePasswordInput!): ChangePasswordResponse!
   upsertUser(upsertUserInput: UpsertUserInput!): UserDTO!
   updateLastLogin(user_id: Int!): Boolean!
+  getUserActivityStatus(input: GetUserActivityStatusInput!): GetUserActivityStatusResponse!
   deleteUserById(userId: Int!): String!
   changeRole(input: ChangeRoleInput!): String!
   statusChange(data: StatusChangeInputDto!): StatusChangeResponseDto!
@@ -489,6 +529,10 @@ input UpsertUserInput {
   is_shani: Boolean! = false
   facebook_profile: String
   expectation: String
+}
+
+input GetUserActivityStatusInput {
+  id: Int!
 }
 
 input ChangeRoleInput {

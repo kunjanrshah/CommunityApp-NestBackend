@@ -13,6 +13,11 @@ import { GetContactListResponse } from './dto/model/get-contact-list.response';
 import { GetContactListInput } from './dto/get-contact-list.input';
 import { SearchByCityInput } from './dto/search-by-city.input';
 import { SearchByCityResponse } from './dto/model/search-by-city.response';
+import { GetUsersByDateInput, GetUsersByDateResponse } from './dto/user.by-date.dto';
+import {
+  GetUserActivityStatusInput,
+  GetUserActivityStatusResponse,
+} from './dto/activity-status.dto';
 
 @Resolver(() => UserDTO)
 export class UserResolver {
@@ -50,6 +55,13 @@ export class UserResolver {
     return this.userService.updateLastLogin(user_id);
   }
 
+  @Mutation(() => GetUserActivityStatusResponse)
+  async getUserActivityStatus(
+    @Args('input') input: GetUserActivityStatusInput,
+  ): Promise<GetUserActivityStatusResponse> {
+    return this.userService.getUserActivityStatus(input);
+  }
+
   @Query(() => [UserDTO])
   async getFamilyMembers(@Args('head_id', { type: () => Number }) head_id: number) {
     return this.userService.getFamilyMembers(head_id);
@@ -63,6 +75,11 @@ export class UserResolver {
     @Args('limit') limit: number,
   ) {
     return this.userService.getUsersByDateRange(fromDate, toDate, page, limit);
+  }
+
+  @Query(() => GetUsersByDateResponse, { name: 'usersByDate' })
+  async getUsersByDate(@Args('input') input: GetUsersByDateInput): Promise<GetUsersByDateResponse> {
+    return this.userService.getUsersByDate(input);
   }
 
   @Query(() => [UserDTO])
