@@ -271,7 +271,9 @@ export interface LoginInput {
 }
 
 export interface ForgotPasswordInput {
-  email: string;
+  email?: Nullable<string>;
+  mobile?: Nullable<string>;
+  resetType: string;
 }
 
 export interface ResetPasswordInput {

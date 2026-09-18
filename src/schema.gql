@@ -591,7 +591,9 @@ input LoginInput {
 }
 
 input ForgotPasswordInput {
-  email: String!
+  email: String
+  mobile: String
+  resetType: String! = "email"
 }
 
 input ResetPasswordInput {

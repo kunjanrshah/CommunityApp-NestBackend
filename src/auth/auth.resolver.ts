@@ -5,7 +5,7 @@ import { AuthResponse, RegisterInput } from 'src/auth/dto/register.input';
 import { Public } from 'src/public.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EmailService } from './email.service';
-import { v4 as uuidv4 } from 'uuid';
+import { randomInt } from 'crypto';
 import * as bcrypt from 'bcryptjs';
 import { ForgotPasswordInput } from './dto/forgot-password.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
@@ -52,25 +52,52 @@ export class AuthResolver {
   @Public()
   @Mutation(() => String)
   async forgotPassword(@Args('forgotPasswordInput') forgotPasswordInput: ForgotPasswordInput) {
-    const { email } = forgotPasswordInput;
-    const user = await this.prisma.user.findFirst({ where: { email } });
+    const { resetType } = forgotPasswordInput;
 
-    if (!user) throw new Error('User not found');
+    // Mirror the legacy CodeIgniter ForgotPassword API which accepts
+    // `reset_type` = 'mobile' | 'email' plus a `username` (mobile no. or email).
+    let user;
+    let lookupLabel: string;
 
-    // Generate reset token & expiry (1 hour)
-    const resetToken = uuidv4();
-    const resetTokenExpiry = new Date(Date.now() + 3600000);
+    if (resetType === 'mobile') {
+      if (!forgotPasswordInput.mobile) throw new Error('Mobile number is required');
+      user = await this.prisma.user.findFirst({ where: { mobile: forgotPasswordInput.mobile } });
+      lookupLabel = 'Mobile No Does Not Exist';
+    } else {
+      if (!forgotPasswordInput.email) throw new Error('Email is required');
+      user = await this.prisma.user.findFirst({ where: { email: forgotPasswordInput.email } });
+      lookupLabel = 'Email Does Not Exist';
+    }
 
-    // Save token in DB
+    if (!user) throw new Error(lookupLabel);
+
+    // We CANNOT recover the user's original password because passwords are
+    // stored as one-way bcrypt hashes. Instead, generate a brand-new temporary
+    // password (6 numeric digits, crypto-secure), store its hash, and email
+    // the plain text to the user.
+    // NOTE: 6 digits = 1,000,000 combinations. Fine as a one-time temporary
+    // password, but NOT suitable as a permanent password.
+    const temporaryPassword = Array.from({ length: 6 }, () => randomInt(10)).join('');
+    const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+
+    // Replace the stored password hash with the temporary one.
     await this.prisma.user.update({
-      where: { email },
-      data: { resetToken, resetTokenExpiry },
+      where: { id: user.id },
+      data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null },
     });
 
-    // Send reset email
-    await this.emailService.sendPasswordResetEmail(email, resetToken);
+    // Send the temporary password in the email (mirrors the legacy CodeIgniter
+    // behaviour of emailing/SMS-ing the plain-text password).
+    const destinationEmail = user.email ?? forgotPasswordInput.email;
+    if (!destinationEmail) {
+      throw new Error('No email on file. Please contact support to reset your password.');
+    }
 
-    return 'Password reset link sent to email!';
+    await this.emailService.sendTemporaryPasswordEmail(destinationEmail, temporaryPassword);
+
+    return resetType === 'mobile'
+      ? 'Temporary password sent to your registered email!'
+      : 'Temporary password sent to email!';
   }
 
   // 🔹 Reset Password Mutation
