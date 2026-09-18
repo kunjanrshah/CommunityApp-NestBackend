@@ -20,25 +20,40 @@ import { GetUsersByDateInput, GetUsersByDateResponse } from './dto/user.by-date.
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+  async changePassword(userId: number, currentPassword: string, newPassword: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
 
-    if (!user) {
+    if (!user || user.deleted) {
       throw new BadRequestException('User not found');
     }
 
-    const passwordValid = await bcrypt.compare(oldPassword, user.password);
+    // Current password may be the original one OR a temporary password issued
+    // by the forgotPassword flow. Both are stored as the same bcrypt hash
+    // (rounds = 10 everywhere), so a single compare keeps the two APIs in sync.
+    const passwordValid = await bcrypt.compare(currentPassword, user.password);
     if (!passwordValid) {
-      throw new UnauthorizedException('Old password is incorrect');
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    // Prevent the user from "changing" back to the very same password.
+    const isSameAsCurrent = await bcrypt.compare(newPassword, user.password);
+    if (isSameAsCurrent) {
+      throw new BadRequestException('New password must be different from the current password');
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await this.prisma.user.update({
       where: { id: userId },
-      data: { password: hashedPassword },
+      data: {
+        password: hashedPassword,
+        // Keep in sync with the forgot/reset flow: any pending reset token is
+        // invalidated as soon as the user changes the password themselves.
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
     });
 
     return { message: 'Password changed successfully' };
