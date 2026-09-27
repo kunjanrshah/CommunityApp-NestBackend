@@ -42,13 +42,20 @@ export class MastersResolver {
   ): Promise<GetMastersResponseDTO> {
     return this.mastersService.getRecords('businessCategory', date?.date);
   }
-  // TODO: NO NEED
-  // @Query(() => GetMastersResponseDTO)
-  // async getOccupations(
-  //   @Args('date', { nullable: true }) date?: string,
-  // ): Promise<GetMastersResponseDTO> {
-  //   return this.mastersService.getRecords('occupation', date);
-  // }
+
+  @Query(() => GetMastersResponseDTO)
+  async getCurrentActivities(
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
+  ): Promise<GetMastersResponseDTO> {
+    return this.mastersService.getRecords('currentActivity', date?.date);
+  }
+
+  @Query(() => GetMastersResponseDTO)
+  async getOccupations(
+    @Args('date', { type: () => DateInputDto, nullable: true }) date?: DateInputDto,
+  ): Promise<GetMastersResponseDTO> {
+    return this.mastersService.getRecords('occupation', date?.date);
+  }
 
   @Query(() => GetMastersResponseDTO)
   async getCommittees(

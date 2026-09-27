@@ -134,4 +134,68 @@ export class UserDTO {
 
   @Field(() => String, { nullable: true })
   reminder_expire_date?: string;
+
+  /**
+   * Legacy GetFamilyMembers enrichment — percentage string e.g. "75%" of the
+   * mandatory profile keys that have been filled in.
+   */
+  @Field(() => String, { nullable: true })
+  profile_completed?: string;
+
+  /** Legacy GetFamilyMembers enrichment — 1 when the user was recently online. */
+  @Field(() => Int, { nullable: true })
+  online_status?: number;
+
+  /** Legacy enrichment — first name of the head user this member belongs to. */
+  @Field(() => String, { nullable: true })
+  head_name?: string;
+
+  /** Legacy enrichment — surname (sub-cast name). */
+  @Field(() => String, { nullable: true })
+  last_name?: string;
+
+  @Field(() => String, { nullable: true })
+  city?: string;
+
+  @Field(() => String, { nullable: true })
+  state?: string;
+
+  @Field(() => String, { nullable: true })
+  sub_community?: string;
+
+  @Field(() => String, { nullable: true })
+  local_community?: string;
+
+  @Field(() => String, { nullable: true })
+  relation?: string;
+
+  @Field(() => String, { nullable: true })
+  designation?: string;
+
+  @Field(() => String, { nullable: true })
+  committee?: string;
+
+  @Field(() => String, { nullable: true })
+  education?: string;
+
+  @Field(() => String, { nullable: true })
+  occupation?: string;
+
+  @Field(() => String, { nullable: true })
+  current_activity?: string;
+
+  @Field(() => String, { nullable: true })
+  gotra?: string;
+
+  @Field(() => String, { nullable: true })
+  native?: string;
+
+  @Field(() => String, { nullable: true })
+  business_category?: string;
+
+  @Field(() => String, { nullable: true })
+  business_sub_category?: string;
+
+  @Field(() => String, { nullable: true })
+  mossad?: string;
 }

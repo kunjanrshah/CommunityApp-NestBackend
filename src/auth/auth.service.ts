@@ -225,6 +225,17 @@ export class AuthService {
     return !!versionExists;
   }
 
+  /**
+   * Mirrors the legacy "GetUpdatedVersion" REST endpoint data payload — the
+   * full AppVersion record that the Android/iOS apps compare against the
+   * version number they bundle.
+   */
+  async getAppVersion() {
+    return this.prisma.appVersion.findFirst({
+      orderBy: { id: 'desc' },
+    });
+  }
+
   async updateDeviceToken(userId: number, token: string): Promise<boolean> {
     // Check if the device token already exists for the user
     const existingDevice = await this.prisma.tkn_devices.findFirst({

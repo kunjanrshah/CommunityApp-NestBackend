@@ -55,4 +55,19 @@ export class EmailService {
         `<p>Sign in at <a href="${baseUrl}">${baseUrl}</a> and change the password as soon as possible.</p>`,
     });
   }
+
+  /**
+   * Generic email sender — mirrors the legacy "SendMail" REST endpoint which
+   * accepted a subject / body / to_email triplet. Throws on failure so the
+   * GraphQL layer can surface a proper error.
+   */
+  async sendMail(toEmail: string, subject: string, body: string): Promise<void> {
+    await this.transporter.sendMail({
+      from: `"${this.fromName}" <${this.fromEmail}>`,
+      to: toEmail,
+      subject,
+      text: body,
+      html: `<p>${body.replace(/\n/g, '<br/>')}</p>`,
+    });
+  }
 }

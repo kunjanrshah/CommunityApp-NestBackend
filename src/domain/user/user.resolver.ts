@@ -18,6 +18,11 @@ import {
   GetUserActivityStatusInput,
   GetUserActivityStatusResponse,
 } from './dto/activity-status.dto';
+import { GetFamilyMembersResponse } from './dto/model/get-family-members.response';
+import { InnerLoginInput } from './dto/inner-login.input';
+import { InnerLogoutInput } from './dto/inner-logout.input';
+import { SearchCommitteeUsersInput } from './dto/search-committee-users.input';
+import { SearchCommitteeUsersResponse } from './dto/model/search-committee-users.response';
 
 @Resolver(() => UserDTO)
 export class UserResolver {
@@ -62,9 +67,36 @@ export class UserResolver {
     return this.userService.getUserActivityStatus(input);
   }
 
-  @Query(() => [UserDTO])
-  async getFamilyMembers(@Args('head_id', { type: () => Number }) head_id: number) {
-    return this.userService.getFamilyMembers(head_id);
+  @Query(() => GetFamilyMembersResponse)
+  async getFamilyMembers(
+    @Args('head_id', { type: () => Int }) head_id: number,
+    @Args('loginUserId', { type: () => Int, nullable: true }) loginUserId?: number,
+  ): Promise<GetFamilyMembersResponse> {
+    return this.userService.getFamilyMembers(head_id, loginUserId);
+  }
+
+  @Query(() => UserDTO)
+  async getUserProfile(@Args('id', { type: () => Int }) id: number) {
+    return this.userService.getUserProfile(id);
+  }
+
+  @Query(() => SearchCommitteeUsersResponse)
+  async searchCommitteeUsers(
+    @Args('input') input: SearchCommitteeUsersInput,
+  ): Promise<SearchCommitteeUsersResponse> {
+    return this.userService.searchCommitteeUsers(input);
+  }
+
+  @Mutation(() => String)
+  async innerLogin(@Args('input') input: InnerLoginInput) {
+    const result = await this.userService.innerLogin(input);
+    return result.success ? 'Login successful' : 'Already logged in';
+  }
+
+  @Mutation(() => String)
+  async innerLogout(@Args('input') input: InnerLogoutInput) {
+    const result = await this.userService.innerLogout(input);
+    return result.message;
   }
 
   @Query(() => [UserDTO], { name: 'usersByDateRange' })

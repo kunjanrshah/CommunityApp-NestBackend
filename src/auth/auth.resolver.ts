@@ -9,6 +9,8 @@ import { randomInt } from 'crypto';
 import * as bcrypt from 'bcryptjs';
 import { ForgotPasswordInput } from './dto/forgot-password.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
+import { SendMailInput } from './dto/send-mail.input';
+import { AppVersionDto } from './dto/model/app-version.dto';
 
 @Resolver()
 export class AuthResolver {
@@ -138,5 +140,17 @@ export class AuthResolver {
   @Query(() => Boolean)
   async isAppVersionExists(@Args('version', { type: () => Number }) version: number) {
     return this.authService.checkVersionExists(version);
+  }
+
+  @Public()
+  @Query(() => AppVersionDto, { nullable: true })
+  async getAppVersion() {
+    return this.authService.getAppVersion();
+  }
+
+  @Mutation(() => String)
+  async sendMail(@Args('input') input: SendMailInput): Promise<string> {
+    await this.emailService.sendMail(input.toEmail, input.subject, input.body);
+    return 'Email sent';
   }
 }

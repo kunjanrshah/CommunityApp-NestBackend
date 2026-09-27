@@ -8,6 +8,11 @@ type AuthResponse {
   message: String!
 }
 
+type AppVersionDto {
+  id: Int!
+  version: Int!
+}
+
 type UserAddressDTO {
   id: Int!
   user_id: Int!
@@ -133,6 +138,25 @@ type UserDTO {
   reminder_birth_date: String
   reminder_marriage_date: String
   reminder_expire_date: String
+  profile_completed: String
+  online_status: Int
+  head_name: String
+  last_name: String
+  city: String
+  state: String
+  sub_community: String
+  local_community: String
+  relation: String
+  designation: String
+  committee: String
+  education: String
+  occupation: String
+  current_activity: String
+  gotra: String
+  native: String
+  business_category: String
+  business_sub_category: String
+  mossad: String
 }
 
 enum Role {
@@ -184,6 +208,19 @@ type GetUserActivityStatusResponse {
   success: Boolean!
   message: String
   data: [UserActivityStatusDTO!]
+}
+
+type GetFamilyMembersResponse {
+  success: Boolean!
+  total_records: Int!
+  members: [UserDTO!]
+}
+
+type SearchCommitteeUsersResponse {
+  success: Boolean!
+  message: String
+  total_records: Int!
+  members: [UserDTO!]
 }
 
 type MasterDTO {
@@ -280,7 +317,9 @@ type UploadModel {
 }
 
 type Query {
-  getFamilyMembers(head_id: Float!): [UserDTO!]!
+  getFamilyMembers(head_id: Int!, loginUserId: Int): GetFamilyMembersResponse!
+  getUserProfile(id: Int!): UserDTO!
+  searchCommitteeUsers(input: SearchCommitteeUsersInput!): SearchCommitteeUsersResponse!
   usersByDateRange(fromDate: String!, toDate: String!, page: Float!, limit: Float!): [UserDTO!]!
   usersByDate(input: GetUsersByDateInput!): GetUsersByDateResponse!
   getInactiveUsers(input: GetInactiveUsersInput!): [UserDTO!]!
@@ -292,6 +331,8 @@ type Query {
   getCities(date: DateInputDto): GetMastersResponseDTO!
   getStates(date: DateInputDto): GetMastersResponseDTO!
   getBusinessCategories(date: DateInputDto): GetMastersResponseDTO!
+  getCurrentActivities(date: DateInputDto): GetMastersResponseDTO!
+  getOccupations(date: DateInputDto): GetMastersResponseDTO!
   getCommittees(date: DateInputDto): GetMastersResponseDTO!
   getDesignations(date: DateInputDto): GetMastersResponseDTO!
   getEducations(date: DateInputDto): GetMastersResponseDTO!
@@ -309,6 +350,15 @@ type Query {
   smartFilter(input: SearchRequestDTO!): SearchResult!
   nearByUsers(filter: GetNearbyUsersInput!): SearchResult!
   isAppVersionExists(version: Float!): Boolean!
+  getAppVersion: AppVersionDto
+}
+
+input SearchCommitteeUsersInput {
+  start: Int! = 0
+  length: Int! = 25
+  filterBy: String
+  committeeId: Int
+  designationId: Int
 }
 
 input GetUsersByDateInput {
@@ -446,6 +496,8 @@ type Mutation {
   upsertUser(upsertUserInput: UpsertUserInput!): UserDTO!
   updateLastLogin(user_id: Int!): Boolean!
   getUserActivityStatus(input: GetUserActivityStatusInput!): GetUserActivityStatusResponse!
+  innerLogin(input: InnerLoginInput!): String!
+  innerLogout(input: InnerLogoutInput!): String!
   deleteUserById(userId: Int!): String!
   changeRole(input: ChangeRoleInput!): String!
   statusChange(data: StatusChangeInputDto!): StatusChangeResponseDto!
@@ -460,6 +512,7 @@ type Mutation {
   updateDeviceToken: Boolean!
   forgotPassword(forgotPasswordInput: ForgotPasswordInput!): String!
   resetPassword(resetPasswordInput: ResetPasswordInput!): String!
+  sendMail(input: SendMailInput!): String!
 }
 
 input ChangePasswordInput {
@@ -535,6 +588,15 @@ input GetUserActivityStatusInput {
   id: Int!
 }
 
+input InnerLoginInput {
+  id: Int!
+  password: String!
+}
+
+input InnerLogoutInput {
+  id: Int!
+}
+
 input ChangeRoleInput {
   idList: [Float!]!
   role: String!
@@ -599,4 +661,10 @@ input ForgotPasswordInput {
 input ResetPasswordInput {
   token: String!
   password: String!
+}
+
+input SendMailInput {
+  toEmail: String!
+  subject: String!
+  body: String!
 }

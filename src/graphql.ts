@@ -23,6 +23,14 @@ export enum Role {
   USER = 'USER',
 }
 
+export interface SearchCommitteeUsersInput {
+  start: number;
+  length: number;
+  filterBy?: Nullable<string>;
+  committeeId?: Nullable<number>;
+  designationId?: Nullable<number>;
+}
+
 export interface GetUsersByDateInput {
   fromdate?: Nullable<string>;
   todate?: Nullable<string>;
@@ -218,6 +226,15 @@ export interface GetUserActivityStatusInput {
   id: number;
 }
 
+export interface InnerLoginInput {
+  id: number;
+  password: string;
+}
+
+export interface InnerLogoutInput {
+  id: number;
+}
+
 export interface ChangeRoleInput {
   idList: number[];
   role: string;
@@ -281,10 +298,21 @@ export interface ResetPasswordInput {
   password: string;
 }
 
+export interface SendMailInput {
+  toEmail: string;
+  subject: string;
+  body: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   message: string;
+}
+
+export interface AppVersionDto {
+  id: number;
+  version: number;
 }
 
 export interface UserAddressDTO {
@@ -395,6 +423,25 @@ export interface UserDTO {
   reminder_birth_date?: Nullable<string>;
   reminder_marriage_date?: Nullable<string>;
   reminder_expire_date?: Nullable<string>;
+  profile_completed?: Nullable<string>;
+  online_status?: Nullable<number>;
+  head_name?: Nullable<string>;
+  last_name?: Nullable<string>;
+  city?: Nullable<string>;
+  state?: Nullable<string>;
+  sub_community?: Nullable<string>;
+  local_community?: Nullable<string>;
+  relation?: Nullable<string>;
+  designation?: Nullable<string>;
+  committee?: Nullable<string>;
+  education?: Nullable<string>;
+  occupation?: Nullable<string>;
+  current_activity?: Nullable<string>;
+  gotra?: Nullable<string>;
+  native?: Nullable<string>;
+  business_category?: Nullable<string>;
+  business_sub_category?: Nullable<string>;
+  mossad?: Nullable<string>;
 }
 
 export interface ChangePasswordResponse {
@@ -437,6 +484,19 @@ export interface GetUserActivityStatusResponse {
   success: boolean;
   message?: Nullable<string>;
   data?: Nullable<UserActivityStatusDTO[]>;
+}
+
+export interface GetFamilyMembersResponse {
+  success: boolean;
+  total_records: number;
+  members?: Nullable<UserDTO[]>;
+}
+
+export interface SearchCommitteeUsersResponse {
+  success: boolean;
+  message?: Nullable<string>;
+  total_records: number;
+  members?: Nullable<UserDTO[]>;
 }
 
 export interface MasterDTO {
@@ -533,7 +593,14 @@ export interface UploadModel {
 }
 
 export interface IQuery {
-  getFamilyMembers(head_id: number): UserDTO[] | Promise<UserDTO[]>;
+  getFamilyMembers(
+    head_id: number,
+    loginUserId?: Nullable<number>,
+  ): GetFamilyMembersResponse | Promise<GetFamilyMembersResponse>;
+  getUserProfile(id: number): UserDTO | Promise<UserDTO>;
+  searchCommitteeUsers(
+    input: SearchCommitteeUsersInput,
+  ): SearchCommitteeUsersResponse | Promise<SearchCommitteeUsersResponse>;
   usersByDateRange(
     fromDate: string,
     toDate: string,
@@ -552,6 +619,12 @@ export interface IQuery {
   getCities(date?: Nullable<DateInputDto>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
   getStates(date?: Nullable<DateInputDto>): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
   getBusinessCategories(
+    date?: Nullable<DateInputDto>,
+  ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getCurrentActivities(
+    date?: Nullable<DateInputDto>,
+  ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
+  getOccupations(
     date?: Nullable<DateInputDto>,
   ): GetMastersResponseDTO | Promise<GetMastersResponseDTO>;
   getCommittees(
@@ -590,6 +663,7 @@ export interface IQuery {
   smartFilter(input: SearchRequestDTO): SearchResult | Promise<SearchResult>;
   nearByUsers(filter: GetNearbyUsersInput): SearchResult | Promise<SearchResult>;
   isAppVersionExists(version: number): boolean | Promise<boolean>;
+  getAppVersion(): Nullable<AppVersionDto> | Promise<Nullable<AppVersionDto>>;
 }
 
 export interface IMutation {
@@ -602,6 +676,8 @@ export interface IMutation {
   getUserActivityStatus(
     input: GetUserActivityStatusInput,
   ): GetUserActivityStatusResponse | Promise<GetUserActivityStatusResponse>;
+  innerLogin(input: InnerLoginInput): string | Promise<string>;
+  innerLogout(input: InnerLogoutInput): string | Promise<string>;
   deleteUserById(userId: number): string | Promise<string>;
   changeRole(input: ChangeRoleInput): string | Promise<string>;
   statusChange(
@@ -618,6 +694,7 @@ export interface IMutation {
   updateDeviceToken(): boolean | Promise<boolean>;
   forgotPassword(forgotPasswordInput: ForgotPasswordInput): string | Promise<string>;
   resetPassword(resetPasswordInput: ResetPasswordInput): string | Promise<string>;
+  sendMail(input: SendMailInput): string | Promise<string>;
 }
 
 export type DateTime = any;

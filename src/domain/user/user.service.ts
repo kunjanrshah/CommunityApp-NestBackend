@@ -15,6 +15,44 @@ import {
   UserActivityStatusDTO,
 } from './dto/activity-status.dto';
 import { GetUsersByDateInput, GetUsersByDateResponse } from './dto/user.by-date.dto';
+import { GetFamilyMembersResponse } from './dto/model/get-family-members.response';
+import { SearchCommitteeUsersInput } from './dto/search-committee-users.input';
+import { SearchCommitteeUsersResponse } from './dto/model/search-committee-users.response';
+import { InnerLoginInput } from './dto/inner-login.input';
+import { InnerLogoutInput } from './dto/inner-logout.input';
+
+/**
+ * Loosely typed view of a Prisma user row together with its eagerly loaded
+ * relation masters. `GetFamilyMembers`, `GetUserProfile` and
+ * `SearchCommitteeUsers` flatten these nested names onto the row (legacy
+ * `getMembers()` behaviour), so the helpers below only need `name` lookups on a
+ * handful of relations. Any other column stays reachable through the index
+ * signature.
+ */
+type UserRowWithRelations = {
+  name?: string | null;
+  city?: UserRowWithRelations | null;
+  states?: UserRowWithRelations | null;
+  subCommunity?: UserRowWithRelations | null;
+  localCommunity?: UserRowWithRelations | null;
+  subCast?: UserRowWithRelations | null;
+  relation?: UserRowWithRelations | null;
+  education?: UserRowWithRelations | null;
+  occupation?: UserRowWithRelations | null;
+  designation?: UserRowWithRelations | null;
+  committee?: UserRowWithRelations | null;
+  businessCategory?: UserRowWithRelations | null;
+  current_activity?: UserRowWithRelations | null;
+  gotra?: UserRowWithRelations | null;
+  native_place?: UserRowWithRelations | null;
+  userAddress?: UserRowWithRelations | null;
+  userWorkDetail?: UserRowWithRelations | null;
+  userPersonalDetail?: UserRowWithRelations | null;
+  userMatrimony?: UserRowWithRelations | null;
+  last_login?: Date | string | null;
+  login_status?: boolean | number | null;
+  [key: string]: unknown;
+};
 
 @Injectable()
 export class UserService {
@@ -383,16 +421,349 @@ export class UserService {
     return { success: true, message: 'Users online updated', data };
   }
 
-  async getFamilyMembers(head_id: number) {
-    return this.prisma.user.findMany({
-      where: { head_id },
-      include: {
-        userAddress: true,
-        userMatrimony: true,
-        userPersonalDetail: true,
-        userWorkDetail: true,
-      },
+  /**
+   * Family list that mirrors the legacy CodeIgniter "GetFamilyMembers" REST
+   * endpoint (API_model::getMembers + GetFamilyMembers controller).
+   *
+   * Legacy behaviour replicated here:
+   *  - returns everyone with `head_id = $head_id` PLUS the head user itself
+   *  - each member is enriched with joined master names (city, state,
+   *    sub_community, local_community, last_name/surname, relation,
+   *    designation, committee, education, occupation, current_activity,
+   *    gotra, native, business_category, mossad)
+   *  - `profile_completed` % based on mandatory profile keys
+   *  - `online_status` 0/1 using the same 3.5 minute window as the legacy app
+   *  - members are ordered HEAD first, then the WIFE, then the rest
+   *  - envelope `{ success, total_records, members }`
+   *  - when an optional `loginUserId` is supplied, the legacy endpoint also
+   *    refreshed that user's `last_login` timestamp
+   */
+  async getFamilyMembers(head_id: number, loginUserId?: number): Promise<GetFamilyMembersResponse> {
+    if (loginUserId) {
+      try {
+        await this.prisma.user.update({
+          where: { id: loginUserId },
+          data: { last_login: new Date() },
+        });
+      } catch {
+        /* non-fatal: keep returning the list even if the login stamp fails */
+      }
+    }
+
+    const users = await this.prisma.user.findMany({
+      where: { OR: [{ head_id }, { id: head_id }] },
+      include: this.familyInclude,
+      orderBy: { id: 'asc' },
     });
+
+    const enriched = users.map((user) => this.enrichFamilyMember(user, users));
+    const ordered = this.orderFamilyMembers(enriched);
+
+    return {
+      success: true,
+      total_records: ordered.length,
+      members: ordered as unknown as GetFamilyMembersResponse['members'],
+    };
+  }
+
+  /**
+   * Mirrors the legacy "GetUserProfile" REST endpoint (single user row by id).
+   */
+  async getUserProfile(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: this.familyInclude,
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    return this.enrichFamilyMember(user, [user]);
+  }
+
+  /**
+   * Mirrors the legacy "InnerLogin" REST endpoint. Instead of the legacy
+   * plain-text `profile_password` column (which no longer exists) the new
+   * schema stores a bcrypt hash in `user.password`, so we compare against it.
+   * On success, `last_login` is refreshed and `login_status` is set to true.
+   */
+  async innerLogin(input: InnerLoginInput) {
+    const user = await this.prisma.user.findUnique({ where: { id: input.id } });
+
+    if (!user || user.deleted) {
+      throw new UnauthorizedException('Invalid user');
+    }
+
+    const isPasswordValid = await bcrypt.compare(input.password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    const now = new Date();
+    if (!user.login_status) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { last_login: now, login_status: true },
+      });
+      return { success: true, message: 'Login successful', id: user.id };
+    }
+
+    // Legacy behaviour: an already-logged-in profile returned a special message.
+    return { success: false, message: 'Already logged in', id: user.id };
+  }
+
+  /**
+   * Mirrors the legacy "InnerLogout" REST endpoint: sets `login_status` to
+   * false and refreshes `last_login`.
+   */
+  async innerLogout(input: InnerLogoutInput) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: input.id },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    await this.prisma.user.update({
+      where: { id: input.id },
+      data: { last_login: new Date(), login_status: false },
+    });
+
+    return { success: true, message: 'Logout successful', id: input.id };
+  }
+
+  /**
+   * Mirrors the legacy "SearchCommitteeUsers" REST endpoint. Returns active
+   * users who belong to a committee (have a `userWorkDetail` row with a
+   * committee / designation), optionally narrowed by committee, designation
+   * and free-text `filterBy`, with paging via start/length.
+   */
+  async searchCommitteeUsers(
+    input: SearchCommitteeUsersInput,
+  ): Promise<SearchCommitteeUsersResponse> {
+    const { start = 0, length = 25, filterBy, committeeId, designationId } = input;
+
+    const where = this.buildCommitteeUsersWhere(filterBy, committeeId, designationId);
+
+    const totalRecords = await this.prisma.user.count({ where });
+
+    const users = await this.prisma.user.findMany({
+      where,
+      skip: start >= 0 ? start : 0,
+      take: length > 0 ? length : 25,
+      include: this.familyInclude,
+      orderBy: { id: 'desc' }, // legacy data-table order: id DESC
+    });
+
+    const enriched = users.map((user) => this.enrichFamilyMember(user, users));
+
+    return {
+      success: true,
+      message: 'Data Retrieved Successfully',
+      total_records: totalRecords,
+      members: enriched as unknown as SearchCommitteeUsersResponse['members'],
+    };
+  }
+
+  private buildCommitteeUsersWhere(
+    filterBy?: string,
+    committeeId?: number,
+    designationId?: number,
+  ): Prisma.UserWhereInput {
+    const committeeFilters: Prisma.UserWorkDetailWhereInput[] = [];
+    if (committeeId) committeeFilters.push({ committee_id: committeeId });
+    if (designationId) committeeFilters.push({ designation_id: designationId });
+    if (!committeeId && !designationId) {
+      committeeFilters.push({
+        OR: [{ committee_id: { not: null } }, { designation_id: { not: null } }],
+      });
+    }
+
+    const where: Prisma.UserWhereInput = {
+      status: true,
+      deleted: false,
+      userWorkDetail: { is: { AND: committeeFilters } },
+    };
+
+    if (filterBy) {
+      where.OR = [
+        { member_code: { contains: filterBy, mode: 'insensitive' } },
+        { first_name: { contains: filterBy, mode: 'insensitive' } },
+        { mobile: { contains: filterBy, mode: 'insensitive' } },
+        { email: { contains: filterBy, mode: 'insensitive' } },
+        { userAddress: { city: { name: { contains: filterBy, mode: 'insensitive' } } } },
+        { userAddress: { states: { name: { contains: filterBy, mode: 'insensitive' } } } },
+        { userWorkDetail: { committee: { name: { contains: filterBy, mode: 'insensitive' } } } },
+        { userWorkDetail: { designation: { name: { contains: filterBy, mode: 'insensitive' } } } },
+      ];
+    }
+
+    return where;
+  }
+
+  /**
+   * Shared Prisma include that loads every relation the legacy queries used to
+   * JOIN in order to flatten master names on each user row.
+   */
+  private familyInclude = {
+    userAddress: { include: { city: true, states: true } },
+    userMatrimony: true,
+    userPersonalDetail: {
+      include: { current_activity: true, gotra: true, native_place: true },
+    },
+    userWorkDetail: {
+      include: { designation: true, committee: true, businessCategory: true },
+    },
+    subCast: true,
+    occupation: true,
+    education: true,
+    relation: true,
+    subCommunity: true,
+    localCommunity: true,
+  } as const;
+
+  /**
+   * Flattens the related master names onto the user row exactly like the
+   * legacy `getMembers()` SELECT did.
+   */
+  private enrichFamilyMember<T extends { id: number; head_id?: number | null }>(
+    user: T,
+    family: Array<{ id: number; first_name?: string | null }>,
+  ) {
+    const u: Record<string, unknown> = { ...user };
+    const row = user as UserRowWithRelations;
+
+    u.city = row.userAddress?.city?.name ?? '';
+    u.state = row.userAddress?.states?.name ?? '';
+    u.sub_community = row.subCommunity?.name ?? '';
+    u.local_community = row.localCommunity?.name ?? '';
+    u.last_name = row.subCast?.name ?? '';
+    u.relation = row.relation?.name ?? '';
+    u.relation_name = row.relation?.name ?? '';
+    u.designation = row.userWorkDetail?.designation?.name ?? '';
+    u.committee = row.userWorkDetail?.committee?.name ?? '';
+    u.education = row.education?.name ?? '';
+    u.occupation = row.occupation?.name ?? '';
+    u.current_activity = row.userPersonalDetail?.current_activity?.name ?? '';
+    u.gotra = row.userPersonalDetail?.gotra?.name ?? '';
+    u.native = row.userPersonalDetail?.native_place?.name ?? '';
+    u.business_category = row.userWorkDetail?.businessCategory?.name ?? '';
+    // No dedicated tables exist in the new schema for these two legacy masters.
+    u.business_sub_category = '';
+    u.mossad = '';
+
+    // Legacy head_name: the first_name of the head this member belongs to.
+    const headId = user.head_id;
+    u.head_name =
+      headId && headId !== 0 ? family.find((f) => f.id === headId)?.first_name ?? '' : '';
+
+    // Legacy online detection (same 3.5 minute window as GetFamilyMembers.php).
+    const lastTime = row.last_login ? new Date(row.last_login).getTime() : 0;
+    const currentTime = Date.now() - 60 * 3.5 * 1000;
+    const loginStatus = !!row.login_status;
+    u.login_status = loginStatus; // UserDTO declares Boolean — keep it a boolean.
+    u.online_status = currentTime <= lastTime && loginStatus ? 1 : 0;
+
+    u.profile_completed = this.computeProfileCompletion(user);
+
+    return u;
+  }
+
+  /**
+   * Mirrors the legacy GetFamilyMembers `profile_completed` logic: count how
+   * many mandatory profile keys are filled and return "round(filled/total*100)%".
+   */
+  private computeProfileCompletion(user: unknown): string {
+    const u = user as UserRowWithRelations;
+    const personal: UserRowWithRelations = u.userPersonalDetail ?? {};
+    const matrimony: UserRowWithRelations = u.userMatrimony ?? {};
+    const work: UserRowWithRelations = u.userWorkDetail ?? {};
+    const address: UserRowWithRelations = u.userAddress ?? {};
+
+    const mandatory: Record<string, unknown> = {
+      id: u.id,
+      email_address: u.email,
+      gender: u.gender,
+      address: address?.address,
+      mobile: u.mobile,
+      birth_date: personal?.birth_date,
+      birth_time: matrimony?.birth_time,
+      birth_place: matrimony?.birth_place_id,
+      distinct_id: '',
+      native_place_id: personal?.native_place_id,
+      blood_group: personal?.blood_group,
+      current_activity_id: personal?.current_activity_id,
+      gotra_id: personal?.gotra_id,
+      profile_pic: u.profile_pic,
+      region: u.region,
+      is_rented: address?.addr_type === 'RENTED',
+      is_donor: personal?.is_donor,
+      business_category_id: work?.business_category_id,
+      business_sub_category_id: '',
+      work_details: work?.work_details,
+      company_name: work?.company_name,
+      business_address: work?.business_address,
+      education_id: u.education_id,
+      occupation_id: u.occupation_id,
+      designation_id: work?.designation_id,
+    };
+
+    if (personal?.marital_status) {
+      mandatory.marriage_date = personal?.marriage_date;
+      mandatory.mosaad_id = address?.mosaad_id;
+    }
+    if (personal?.matrimony) {
+      mandatory.about_me = matrimony?.about_me;
+      mandatory.weight = matrimony?.weight;
+      mandatory.height = matrimony?.height;
+      mandatory.is_spect = matrimony?.is_spect;
+      mandatory.is_mangal = matrimony?.is_mangal;
+      mandatory.is_shani = matrimony?.is_shani;
+      mandatory.hobby = matrimony?.hobby;
+      mandatory.facebook_profile = matrimony?.facebook_profile;
+      mandatory.expectation = matrimony?.expectation;
+    }
+    if (u.is_expired) {
+      mandatory.expire_date = u.expire_date;
+    }
+
+    // Legacy count: keys that are non-empty and non-zero (0 and '' are empty).
+    const entries = Object.values(mandatory);
+    const filled = entries.filter((v) => {
+      if (v === undefined || v === null || v === '' || v === 0) return false;
+      return v !== false; // boolean false => legacy treated it as empty too
+    }).length;
+    const total = entries.length;
+    const pct = total > 0 ? Math.round((filled / total) * 100) : 0;
+
+    return `${pct}%`;
+  }
+
+  /**
+   * Mirrors the legacy GetFamilyMembers ordering:
+   *  - the HEAD (head_id = 0) is always first
+   *  - the WIFE (relation name = 'Wife') is second
+   *  - everyone else follows in their original (id) order
+   */
+  private orderFamilyMembers(members: Record<string, unknown>[]): Record<string, unknown>[] {
+    if (!members.length) return members;
+
+    const head = members.find((m) => m.head_id === 0);
+
+    // Legacy queried `relations` by name = 'Wife'; be flexible about case.
+    const wife = members.find(
+      (m) => m.head_id !== 0 && String(m.relation).trim().toLowerCase() === 'wife',
+    );
+
+    if (head) {
+      const rest = members.filter((m) => m !== head && m !== wife);
+      return [head, ...(wife ? [wife] : []), ...rest];
+    }
+
+    return members;
   }
 
   async getUsersByDateRange(fromDate: string, toDate: string, page: number, limit: number) {
@@ -713,6 +1084,9 @@ export class UserService {
    *  - optional alphabet filter on first_name (LIKE 'alpha%')
    *  - optional free text search across member_code, first_name, mobile,
    *    email, city and state
+   * Each returned head user (head_id = 0) is enriched with `member_count`, the
+   * number of active non-expired family members under it
+   * (Users_model::get_members_counts($id, 1)).
    * Returns success, totalHead (number of matching head users), totalMem
    * (sum of family members under all matched heads) and the paged member list.
    */
@@ -733,17 +1107,36 @@ export class UserService {
       },
     });
 
-    // Sum the family member count under each matched head user.
+    // Legacy `member_count` (Users_model::get_members_counts called with
+    // $admin = 1 from get_datatables_for_api): number of active, non-expired
+    // family members whose head_id points to this head user. Only head users
+    // (head_id = 0) own a family, every other row reports 0.
+    const pageHeadIds = members.filter((member) => member.head_id === 0).map((member) => member.id);
+    const pageCounts = await this.getMemberCountsByHeadIds(pageHeadIds);
+
+    const membersWithCount = members.map((member) => ({
+      ...member,
+      member_count: member.head_id === 0 ? pageCounts.get(member.id) ?? 0 : 0,
+    }));
+
+    // Legacy `totalMem` is the sum of member_count across EVERY matched head
+    // user, not only the heads on the current page (SearchByCity.php loops over
+    // the unpaged $dataListTotal result set).
     let totalMem = 0;
-    for (const member of members) {
-      totalMem += await this.getMemberFamilyCount(member.id);
+    for (const count of pageCounts.values()) totalMem += count;
+
+    if (members.length < totalHead) {
+      const allHeads = await this.prisma.user.findMany({ where, select: { id: true } });
+      const allCounts = await this.getMemberCountsByHeadIds(allHeads.map((head) => head.id));
+      totalMem = 0;
+      for (const count of allCounts.values()) totalMem += count;
     }
 
     return {
       success: true,
       totalHead,
       totalMem,
-      members,
+      members: membersWithCount,
     };
   }
 
@@ -786,14 +1179,29 @@ export class UserService {
     };
   }
 
-  private async getMemberFamilyCount(headId: number): Promise<number> {
-    return this.prisma.user.count({
+  /**
+   * Batch version of the legacy `get_members_counts($headId, 1)`: returns a map
+   * of head user id -> number of active, non-expired family members under that
+   * head. Head ids without any member are simply absent from the map (callers
+   * default them to 0).
+   */
+  private async getMemberCountsByHeadIds(headIds: number[]): Promise<Map<number, number>> {
+    const memberCounts = new Map<number, number>();
+    const uniqueHeadIds = [...new Set(headIds)].filter((id) => Number.isFinite(id));
+    if (!uniqueHeadIds.length) return memberCounts;
+
+    const counts = await this.prisma.user.groupBy({
+      by: ['head_id'],
       where: {
-        head_id: headId,
+        head_id: { in: uniqueHeadIds },
         is_expired: false,
         status: true,
       },
+      _count: { head_id: true },
     });
+
+    for (const row of counts) memberCounts.set(row.head_id, row._count.head_id);
+    return memberCounts;
   }
 
   // async findUserById(id: number) {

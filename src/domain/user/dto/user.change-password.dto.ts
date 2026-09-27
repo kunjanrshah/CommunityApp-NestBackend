@@ -9,11 +9,11 @@ export class ChangePasswordInput {
   currentPassword: string;
 
   // Password policy stays in sync with the auth module's ResetPasswordInput
-  // (@MinLength(8)) so a password chosen here also satisfies the
+  // (@MinLength(6)) so a password chosen here also satisfies the
   // forgotPassword -> resetPassword flow.
   @Field()
   @IsString()
-  @MinLength(8, { message: 'New password must be at least 8 characters long' })
+  @MinLength(6, { message: 'New password must be at least 6 characters long' })
   newPassword: string;
 }
 
